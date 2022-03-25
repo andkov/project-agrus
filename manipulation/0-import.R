@@ -91,6 +91,7 @@ ds2 <-
   tidyr::pivot_wider(names_from = "signal", values_from = "date_time") 
 
 ds2 %>%
+  arrange(desc(event_n)) %>% 
   readr::write_csv(file = "./data-public/raw/data-input.csv")
 
 ds3 <- 
