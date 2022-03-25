@@ -29,20 +29,35 @@ library(labelled)  # labels - https://cran.r-project.org/web/packages/labelled/v
 library(rlang)     # tidy evaluations -  https://www.tidyverse.org/blog/2019/06/rlang-0-4-0/   
 # 
 # ---- declare-globals ---------------------------------------------------------
-path_file  <- "./data-unshared/raw/air-siren-vinnytsia-2022-03-23.csv"
 
 # path_files should be the last element of the chunk
 # ---- declare-functions -------------------------------------------------------
 # store script-specific function here
 
 # ---- load-data ---------------------------------------------------------------
-ds0 <- readr::read_csv("./data-public/raw/data-input.csv")
+ds0 <- readr::read_csv("./data-public/raw/data-input.csv",col_select = 2:3)
 
 # ---- inspect-data ------------------------------------------------------------
 ds0 %>% glimpse()
 
 # ---- tweak-data --------------------------------------------------------------
-
+ds1 <- 
+  ds0 %>% 
+  mutate(
+    event_n = row_number()
+    ,duration = as.duration(signal_off - signal_on)
+  ) %>% 
+  tidyr::pivot_longer(
+    cols = c("signal_on","signal_off")
+    ,names_to = "signal_goes"
+    ,values_to = "date_time"
+  ) %>% 
+  mutate(
+    signal_goes = signal_goes %>% str_remove("^signal_")
+    ,date = strftime(date_time,"%Y-%m-%d") %>% date()
+    ,time = strftime(date_time,"%H:%M:%S") %>% hms::as_hms()
+  )
+ds1
 # ---- table-1 -----------------------------------------------------------------
 
 
