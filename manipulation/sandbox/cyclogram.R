@@ -72,11 +72,40 @@ ds_day <-
   ) |> 
   dplyr::ungroup() |> 
   dplyr::mutate(
-        date_index       = as.integer(difftime(start_d, min(start_d), units = "days")) + 1L,
+    date_index       = 1L +as.integer(difftime(start_d, min(start_d), units = "days")),
   )
 
-ds_event |> 
-  # dplyr::filter(signal_goes == "on") |> 
+ds_event_within_day <-
+  ds_event |> 
+  dplyr::select(
+    event_id,
+    start_dt,
+    stop_dt,
+  ) |> 
+  dplyr::mutate(
+    # crosses_midnight   = as.Date(start_d) < as.Date(stop_d),
+    days   = 1L + as.integer(difftime(as.Date(stop_dt), as.Date(start_dt), units = "days")),
+  ) |> 
+  tidyr::uncount(days, .remove = FALSE, .id = "day_within_event") |> 
+  dplyr::mutate(
+    # day_within_event_rev = days - day_within_event + 1L,
+    day_first = (day_within_event == 1L),
+    day_last  = (day_within_event == days),
+  ) |> 
+  dplyr::mutate(
+    start_dt  = dplyr::if_else(day_first, start_dt, as.Date(stop_dt) + lubridate::seconds(1)),
+    stop_dt   = dplyr::if_else(day_last , stop_dt , as.Date(stop_dt) - lubridate::seconds(1))
+  ) |> 
+  dplyr::mutate(
+    start_d     = as.Date(start_dt),
+    start_t     = hms::as_hms(start_dt),
+    stop_t      = hms::as_hms(stop_dt),
+  )
+
+ds_event_within_day
+
+# ds_event |>
+ds_event_within_day |>
   # dplyr::select(start_d, start_t, stop_t) |> 
   # dplyr::filter(date == as.Date("2022-03-10")) |> 
   # dplyr::slice(1:2) |>
