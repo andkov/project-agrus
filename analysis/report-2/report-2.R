@@ -54,6 +54,12 @@ ds1 <-
     ,time = strftime(date_time,"%H:%M:%S") %>% hms::as_hms()
   )
 ds1
+ds2 <- 
+  ds1 %>% 
+  group_by(date) %>% 
+  summarize(
+    
+  )
 # ---- table-1 -----------------------------------------------------------------
 
 
