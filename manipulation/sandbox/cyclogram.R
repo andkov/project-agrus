@@ -110,8 +110,10 @@ ds_event_within_day |>
   # dplyr::filter(date == as.Date("2022-03-10")) |> 
   # dplyr::slice(1:2) |>
   ggplot(aes(x = start_d)) +
-  geom_linerange(aes(ymin = start_t, ymax = stop_t)) +
-  
+  geom_rect(
+    aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t),
+    color = "#bbbbbbbb", fill = "#88888888"
+  ) +
   geom_text(data = ds_day, aes(label = date_index), y = -Inf, vjust = -.01) +
   geom_text(data = ds_day, aes(label = event_tally_within_day), y = Inf, vjust = 1.01) +
   scale_y_time() +
@@ -121,6 +123,3 @@ ds_event_within_day |>
     x = NULL,
     y = "Time of Day"
   )
-
-
-
