@@ -71,16 +71,26 @@ ds_date_sunrise <-
   dplyr::filter(dplyr::between(date, date_range[1] - 1L, date_range[2] + 1L))
   
 
-ds_day <- 
+ds_date_tally <-
   ds_event |> 
+  # ds_date_sunrise |> 
+  # # dplyr::left_join(ds_event, by = c("date" = "start_d")) |> 
   dplyr::group_by(start_d) |> 
   dplyr::summarize(
     event_tally_within_day = dplyr::n(),
   ) |> 
-  dplyr::ungroup() |> 
+  dplyr::ungroup()
+
+ds_date <-
+  ds_date_sunrise |>
+  dplyr::left_join(ds_date_tally, by = c("date" = "start_d")) |> 
   dplyr::mutate(
-    date_index       = 1L + as.integer(difftime(start_d, min(start_d), units = "days")),
+    date_index       = 0L + as.integer(difftime(date, min(date), units = "days")),
+  ) |>
+  dplyr::mutate(
+    event_tally_within_day = dplyr::if_else(1L <= date_index, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
   )
+
 
 ds_event_within_day <-
   ds_event |> 
@@ -117,18 +127,27 @@ ds_event_within_day |>
   # dplyr::filter(date == as.Date("2022-03-10")) |> 
   # dplyr::slice(1:2) |>
   ggplot(aes(x = start_d)) +
-  geom_ribbon(data = ds_date_sunrise, aes(x = date, ymax = sunrise, ymin = hms::as_hms("00:00:00"))) +
-  geom_ribbon(data = ds_date_sunrise, aes(x = date, ymin = sunset , ymax = hms::as_hms("24:00:00"))) +
+  geom_ribbon(data = ds_date, aes(x = date, ymax = sunrise, ymin = hms::as_hms("00:00:00")), color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = sunset , ymax = hms::as_hms("24:00:00")), color = NA) +
   geom_rect(
     aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t),
-    color = "#bbbbbbbb", fill = "#88888888"
+    color = "#bbbbbbbb", fill = "#88888888",
+    size = .15
   ) +
-  geom_hline(yintercept = hms::as_hms("23:59:59"), linetype = "44", color = "#bbbbbbbb") +
-  geom_text(data = ds_day, aes(label = date_index), y = -Inf, hjust = .01, srt = 90, size = 3) +
-  geom_text(data = ds_day, aes(label = event_tally_within_day), y = Inf, vjust = 1.01) +
-  scale_y_time() +
+  # geom_hline(yintercept = hms::as_hms("23:59:59"), linetype = "44", color = "#bbbbbbbb") +
+  geom_text(data = ds_date, aes(x = date, label = date_index), y = -Inf, hjust = .01, srt = 90, size = 2, na.rm = T) +
+  geom_text(data = ds_date, aes(x = date, label = event_tally_within_day, color = event_tally_within_day), y = Inf, vjust = 1.01, na.rm = T) +
+  scale_x_date(date_labels = "%b\n%d") +
+  scale_y_time(
+    breaks = hms::as_hms(c("00:00:00", "08:00:00", "12:00:00", "16:00:00", "24:00:00")),
+    labels = c("midnight", "8am", "noon", "4pm", "midnight")
+  ) +
+  # scale_color_brewer(type = "seq", palette = "YlOrRd") +
+  # scale_color_continuous(type = "viridis") +
+  scale_colour_viridis_b(direction = -1) +
   coord_cartesian(ylim = hms::parse_hms(c("00:00:00", "23:59:59"))) +
   theme_minimal() +
+  theme(legend.position = "none") +
   labs(
     x = NULL,
     y = "Time of Day"
