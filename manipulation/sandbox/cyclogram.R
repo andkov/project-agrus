@@ -29,10 +29,8 @@ library(ggplot2)   # graphs
 # library(rlang)     # tidy evaluations -  https://www.tidyverse.org/blog/2019/06/rlang-0-4-0/   
 # 
 # ---- declare-globals ---------------------------------------------------------
+config                         <- config::get()
 
-# path_files should be the last element of the chunk
-# ---- declare-functions -------------------------------------------------------
-# store script-specific function here
 # OuhscMunge::readr_spec_aligned("data-public/raw/data-input.csv")
 col_types <- readr::cols_only(
   `event_n`       = readr::col_integer(),
@@ -44,6 +42,8 @@ col_types <- readr::cols_only(
 ds_event <- readr::read_csv("data-public/raw/data-input.csv", col_types = col_types)
 
 rm(col_types)
+
+ds_date_sunrise <- readr::read_rds(config$path_derived_sunrise_rds)
 
 # ds |> dplyr::glimpse()
 
@@ -64,6 +64,13 @@ ds_event <-
     stop_t           = hms::as_hms(stop_dt),
   ) 
 
+date_range <- range(ds_event$start_d, ds_event$stop_d) 
+
+ds_date_sunrise <-
+  ds_date_sunrise |> 
+  dplyr::filter(dplyr::between(date, date_range[1] - 1L, date_range[2] + 1L))
+  
+
 ds_day <- 
   ds_event |> 
   dplyr::group_by(start_d) |> 
@@ -72,7 +79,7 @@ ds_day <-
   ) |> 
   dplyr::ungroup() |> 
   dplyr::mutate(
-    date_index       = 1L +as.integer(difftime(start_d, min(start_d), units = "days")),
+    date_index       = 1L + as.integer(difftime(start_d, min(start_d), units = "days")),
   )
 
 ds_event_within_day <-
@@ -110,11 +117,14 @@ ds_event_within_day |>
   # dplyr::filter(date == as.Date("2022-03-10")) |> 
   # dplyr::slice(1:2) |>
   ggplot(aes(x = start_d)) +
+  geom_ribbon(data = ds_date_sunrise, aes(x = date, ymax = sunrise, ymin = hms::as_hms("00:00:00"))) +
+  geom_ribbon(data = ds_date_sunrise, aes(x = date, ymin = sunset , ymax = hms::as_hms("24:00:00"))) +
   geom_rect(
     aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t),
     color = "#bbbbbbbb", fill = "#88888888"
   ) +
-  geom_text(data = ds_day, aes(label = date_index), y = -Inf, vjust = -.01) +
+  geom_hline(yintercept = hms::as_hms("23:59:59"), linetype = "44", color = "#bbbbbbbb") +
+  geom_text(data = ds_day, aes(label = date_index), y = -Inf, hjust = .01, srt = 90, size = 3) +
   geom_text(data = ds_day, aes(label = event_tally_within_day), y = Inf, vjust = 1.01) +
   scale_y_time() +
   coord_cartesian(ylim = hms::parse_hms(c("00:00:00", "23:59:59"))) +
@@ -123,3 +133,11 @@ ds_event_within_day |>
     x = NULL,
     y = "Time of Day"
   )
+
+ggsave(
+  filename = "manipulation/sandbox/cyclogram2.png",
+  height   = 4,
+  width    = 5,
+  dpi      = 400,
+  bg       = "white"
+)
