@@ -19,21 +19,31 @@ requireNamespace("OuhscMunge"   ) # remotes::install_github(repo="OuhscBbmc/Ouhs
 # ---- declare-globals ---------------------------------------------------------
 # Constant values that won't change.
 config                         <- config::get()
+format_time <- "%I:%M:%S %p"
 
 # Execute to specify the column types.  It might require some manual adjustment (eg doubles to integers).
 #   OuhscMunge::readr_spec_aligned(config$path_raw_sunrise)
 col_types <- readr::cols_only(
-  Date           = readr::col_character(),
-  Sunrise        = readr::col_time(),
-  Sunset         = readr::col_time(),
-  # Daylength      = readr::col_character()
+  `2022`                          = readr::col_character(),
+  `sunrise time`                  = readr::col_time(format_time),
+  `Zenith`                        = readr::col_time(format_time),
+  `sunset time`                   = readr::col_time(format_time),
+  # `day_length`                    = readr::col_time(format_time),
+  # `day_length_delta`              = readr::col_character(),
+  `Astronomical twilight start`   = readr::col_time(format_time),
+  `Nautical twilight start`       = readr::col_time(format_time),
+  `Civil twilight start`          = readr::col_time(format_time),
+  `Civil twilight end`            = readr::col_time(format_time),
+  `Nautical twilight end`         = readr::col_time(format_time),
+  `Astronomical twilight end`     = readr::col_time(format_time)
 )
+
 
 # ---- load-data ---------------------------------------------------------------
 # Read the CSVs
 
-# Copied from https://geotsy.com/en/ukraine/vinnytsia-20279/sunrise-and-sunset
-ds <- readr::read_tsv(config$path_raw_sunrise  , col_types=col_types)
+# Copied from https://sunsetsunrisetime.com/sun/vinnytsia older version:  https://geotsy.com/en/ukraine/vinnytsia-20279/sunrise-and-sunset
+ds <- readr::read_delim(config$path_raw_sunrise, delim = ";" , col_types=col_types)
 
 rm(col_types)
 
@@ -41,28 +51,55 @@ rm(col_types)
 #   If you print, make sure that the datasets don't contain any PHI.
 #   A normal `data.frame` will print all rows.  But `readr::read_csv()` returns a `tibble::tibble`,
 #   which prints only the first 10 rows by default.  It also lists the data type of each column.
-ds
+# ds
+
 
 # ---- tweak-data --------------------------------------------------------------
 # OuhscMunge::column_rename_headstart(ds) # Help write `dplyr::select()` call.
 ds <-
   ds |>
   dplyr::select(    # `dplyr::select()` drops columns not included.
-    date                   = `Date`,
-    sunrise                = `Sunrise`,
-    sunset                 = `Sunset`,
+    date                              = `2022`,
+    sunrise                           = `sunrise time`,
+    zenith                            = `Zenith`,
+    sunset                            = `sunset time`,
+    start_astronomical                = `Astronomical twilight start`,
+    start_nautical                    = `Nautical twilight start`,
+    start_civil                       = `Civil twilight start`,
+    stop_civil                        = `Civil twilight end`,
+    stop_nautical                     = `Nautical twilight end`,
+    stop_astronomical                 = `Astronomical twilight end`
   ) |>
   dplyr::mutate(
     date  = paste("2022", date),
-    date  = as.Date(date, "%Y %d %b"), # Year day month 
-  )  |>
+    date  = as.Date(date, "%Y %m/%d"), # Year day month
+  ) |>
+  dplyr::mutate(
+    # nadir = zenith - lubridate::hours(12),
+    # nadir = hms::hms(lubridate::hms(zenith) - lubridate::hours(12)),
+  ) |> 
   dplyr::arrange(date)
+
+
+
+# head(ds$nadir)
 
 # ---- verify-values -----------------------------------------------------------
 # OuhscMunge::verify_value_headstart(ds)
-checkmate::assert_date(    ds$date    , any.missing=F , lower=as.Date("2022-01-01"), upper=as.Date("2022-12-31") , unique=T)
-checkmate::assert_character(as.character(ds$sunrise), any.missing=F  , pattern = "^\\d{2}:\\d{2}:00$"  )
-checkmate::assert_character(as.character(ds$sunset ), any.missing=F  , pattern = "^\\d{2}:\\d{2}:00$"  )
+pattern_time <- "^[012]\\d:[012345]\\d:[012345]\\d$"
+
+checkmate::assert_date(    ds$date               , any.missing=F , lower=as.Date("2022-01-01"), upper=as.Date("2022-12-31") , unique=T)
+checkmate::assert_character(as.character(ds$sunrise            ), any.missing=F , pattern = pattern_time)
+checkmate::assert_character(as.character(ds$zenith             ), any.missing=F , pattern = pattern_time)
+checkmate::assert_character(as.character(ds$sunset             ), any.missing=F , pattern = pattern_time)
+checkmate::assert_character(as.character(ds$start_astronomical ), any.missing=T , pattern = pattern_time)
+checkmate::assert_character(as.character(ds$start_nautical     ), any.missing=F , pattern = pattern_time)
+checkmate::assert_character(as.character(ds$start_civil        ), any.missing=F , pattern = pattern_time)
+checkmate::assert_character(as.character(ds$stop_civil         ), any.missing=F , pattern = pattern_time)
+checkmate::assert_character(as.character(ds$stop_nautical      ), any.missing=F , pattern = pattern_time)
+checkmate::assert_character(as.character(ds$stop_astronomical  ), any.missing=T , pattern = pattern_time)
+# checkmate::assert_character(as.character(ds$nadir              ), any.missing=F , pattern = pattern_time)
+
 
 # ---- specify-columns-to-upload -----------------------------------------------
 # Print colnames that `dplyr::select()`  should contain below:
@@ -76,8 +113,15 @@ ds_slim <-
   # dplyr::slice(1:100) |>
   dplyr::select(
     date,
+    start_astronomical,
+    start_nautical,
+    start_civil,
     sunrise,
-    sunset
+    zenith,
+    sunset,
+    stop_civil,
+    stop_nautical,
+    stop_astronomical
   )
 
 ds_slim

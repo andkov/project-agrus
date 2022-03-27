@@ -9,23 +9,23 @@ default:
   # dsn_security                                        : "BbmcSecurity"
   # redcap_pid                                          : 1
   # redcap_instance                                     : "bbmc"
-  
+
   directory_file_server                               : "//pedsis/peds/data/BBMC/prairie-outpost/{project_name}"
   directory_output                                    : !expr strftime(Sys.time(), "{directory_file_server}/data-private/derived/%Y-%m-%d")
   # path_output_summary                                 : !expr strftime(Sys.time(), "{directory_file_server}/data-private/derived/%Y-%m-%d/_summary.csv")
   # path_output_description                             : !expr strftime(Sys.time(), "{directory_file_server}/data-private/derived/%Y-%m-%d/_description.md")
   # directory_meditech_triage                           : "//pedsis/peds/data/BBMC/ou-medicine"
-  
+
   # path_log_flow                                       : !expr strftime(Sys.time(), "data-unshared/log/%Y/%Y-%m/flow-%Y-%m-%d--%H-%M-%S.log")
   # path_log_flow                                       : !expr strftime(Sys.time(), "//pedsis/peds/data/BBMC/prairie-outpost/{project_name}/log/%Y/%Y-%m/flow-%Y-%m-%d--%H-%M-%S.log")
-  
-  path_raw_sunrise                                    : "data-public/raw/date-sunrise-2022.tsv"
+
+  path_raw_sunrise                                    : "data-public/raw/date-sunrise-2022.csv"
   path_derived_sunrise_csv                            : "data-public/derived/date-sunrise-2022.csv"
   path_derived_sunrise_rds                            : "data-public/derived/date-sunrise-2022.rds"
   # path_metadata_ss_dx                                 : "data-public/metadata/ss-dx.csv"
-  
+
   # time_zone_local               :  "America/Chicago"          # Force time calculations to be local, in case remotely run.
-  
+
   # ---- Validation Ranges & Patterns ----
   # range_record_id               : !expr c(1L, 999999L)
   # range_mrn_gecb                : !expr c(400000L, 3999999L)
@@ -52,7 +52,7 @@ default:
   # pattern_pt_name_full          : "^.{2,50}$"
   # pattern_race                  : "^.{5,50}$"
   # pattern_ethnicity             : "^.{7,25}$"
-  
+
   # pattern_icdcm                 : "^[A-Z][0-9][0-9AB]\\.?[0-9A-Z]{0,4}|\\d{3}\\.?\\d{0,2}|E\\d{3}\\.?\\d?|V\\d{2}\\.?\\d{0,2}$<file://.%3f[0-9A-Z]%7b0,4%7d|/d%7b3%7d/.%3f/d%7b0,2%7d|E/d%7b3%7d/.%3f/d%3f|V/d%7b2%7d/.%3f/d%7b0,2%7d$>" # Set database column to `varchar(8)` From https://www.johndcook.com/blog/2019/05/05/regex_icd_codes/
   # pattern_icd10cm               : "^[A-Z][0-9][0-9AB]\\.?[0-9A-Z]{0,4}$<file://.%3f[0-9A-Z]%7b0,4%7d$>"                        # Set database column to `varchar(8)`
   # pattern_icd9cm                : "^\\d{3}\\.?\\d{0,2}|E\\d{3}\\.?\\d?|V\\d{2}\\.?\\d{0,2}$"    # Set database column to `varchar(6)`
@@ -60,7 +60,7 @@ default:
   # pattern_cpt                   : "^\\d{4}[0-9a-z]$"
   # pattern_hcpcs                 : "^[0-9a-z]\\d{4}$<file://d%7b4%7d$>"
   # pattern_hcpcs_cpt             : "^[0-9a-z]\\d{3}[0-9a-z]$<file://d%7b3%7d[0-9a-z]$>"     # Meditech has a field that accepts either cpt or hcpcs
-  
+
   # tables_to_scribe:
   #   -
   #     name: patient
