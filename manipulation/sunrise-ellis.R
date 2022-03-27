@@ -53,6 +53,14 @@ rm(col_types)
 #   which prints only the first 10 rows by default.  It also lists the data type of each column.
 # ds
 
+adjust_daylight_savings <- function (date, time) {
+  # browser()
+  dplyr::if_else(
+    dplyr::between(date, as.Date("2022-03-27"), as.Date("2022-10-29")), # Sunday to Saturday
+    hms::hms(lubridate::hms(time) + lubridate::hours(1)),
+    time,
+  )
+}
 
 # ---- tweak-data --------------------------------------------------------------
 # OuhscMunge::column_rename_headstart(ds) # Help write `dplyr::select()` call.
@@ -78,6 +86,23 @@ ds <-
     # nadir = zenith - lubridate::hours(12),
     # nadir = hms::hms(lubridate::hms(zenith) - lubridate::hours(12)),
   ) |> 
+  dplyr::mutate(
+    sunrise                = adjust_daylight_savings(date, sunrise            ),
+    zenith                 = adjust_daylight_savings(date, zenith             ),
+    sunset                 = adjust_daylight_savings(date, sunset             ),
+    start_astronomical     = adjust_daylight_savings(date, start_astronomical ),
+    start_nautical         = adjust_daylight_savings(date, start_nautical     ),
+    start_civil            = adjust_daylight_savings(date, start_civil        ),
+    stop_civil             = adjust_daylight_savings(date, stop_civil         ),
+    stop_nautical          = adjust_daylight_savings(date, stop_nautical      ),
+    stop_astronomical      = adjust_daylight_savings(date, stop_astronomical  ),
+  ) |> 
+  # dplyr::mutate(
+  #   dplyr::across(
+  #     .cols = -date,
+  #     adjust_daylight_savings
+  #   )
+  # ) |> 
   dplyr::arrange(date)
 
 
