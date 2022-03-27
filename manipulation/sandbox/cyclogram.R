@@ -127,7 +127,9 @@ palette_solid <- list(
   nautical     = "#1d91c0",
   civil        = "#7fcdbb",
   day          = "#ffffd9",
-  signal       = "#660000"  # https://colorswatches.info/color/blood-red
+  signal       = "#660000",  # https://colorswatches.info/color/blood-red
+  boundary     = "gray20",
+  zenith       = "gold"
 )
 
 palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
@@ -138,16 +140,26 @@ ds_date |>
   # dplyr::filter(date == as.Date("2022-03-10")) |> 
   # dplyr::slice(1:2) |>
   ggplot(aes(x = date)) +
-  geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_solid$night       , color = NA) +
-  geom_ribbon(aes(ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_solid$astronomical, color = NA) +
-  geom_ribbon(aes(ymin = start_nautical         , ymax = start_civil            ), fill = palette_solid$nautical    , color = NA) +
-  geom_ribbon(aes(ymin = start_civil            , ymax = sunrise                ), fill = palette_solid$civil       , color = NA) +
-  geom_ribbon(aes(ymin = sunrise                , ymax = sunset                 ), fill = palette_solid$day         , color = NA) +
-  geom_ribbon(aes(ymin = sunset                 , ymax = stop_civil             ), fill = palette_solid$civil       , color = NA) +
-  geom_ribbon(aes(ymin = stop_civil             , ymax = stop_nautical          ), fill = palette_solid$nautical    , color = NA) +
-  geom_ribbon(aes(ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_solid$astronomical, color = NA) +
-  geom_ribbon(aes(ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_solid$night      , color = NA) +
-  geom_line(  aes(y = zenith), color = "gold", linetype = "a3", size = 1) +
+  geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_faint$night       , color = NA) +
+  geom_ribbon(aes(ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_faint$astronomical, color = NA) +
+  geom_ribbon(aes(ymin = start_nautical         , ymax = start_civil            ), fill = palette_faint$nautical    , color = NA) +
+  geom_ribbon(aes(ymin = start_civil            , ymax = sunrise                ), fill = palette_faint$civil       , color = NA) +
+  geom_ribbon(aes(ymin = sunrise                , ymax = sunset                 ), fill = palette_faint$day         , color = NA) +
+  geom_ribbon(aes(ymin = sunset                 , ymax = stop_civil             ), fill = palette_faint$civil       , color = NA) +
+  geom_ribbon(aes(ymin = stop_civil             , ymax = stop_nautical          ), fill = palette_faint$nautical    , color = NA) +
+  geom_ribbon(aes(ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_faint$astronomical, color = NA) +
+  geom_ribbon(aes(ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_faint$night      , color = NA) +
+  
+  geom_line(  aes(y = start_astronomical), color = palette_solid$boundary, linetype = "F3"  ) +
+  geom_line(  aes(y = start_nautical    ), color = palette_solid$boundary,                  size = 1  ) +
+  geom_line(  aes(y = start_civil       ), color = palette_solid$boundary,                  size = .25) +
+  geom_line(  aes(y = sunrise           ), color = palette_solid$boundary, linetype = "F8"  ) +
+  geom_line(  aes(y = sunset            ), color = palette_solid$boundary, linetype = "F8"  ) +  
+  geom_line(  aes(y = stop_civil        ), color = palette_solid$boundary,                  size = .25) +
+  geom_line(  aes(y = stop_nautical     ), color = palette_solid$boundary,                  size = 1  ) +
+  geom_line(  aes(y = stop_astronomical ), color = palette_solid$boundary, linetype = "F3"  ) +
+  
+  geom_line(  aes(y = zenith), color = palette_solid$zenith, linetype = "a3", size = 1) +
   
   geom_rect(
     data = ds_event_within_day,
@@ -160,8 +172,8 @@ ds_date |>
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, vjust = 1.01, na.rm = T) +
   scale_x_date(date_labels = "%b\n%d") +
   scale_y_time(
-    breaks = hms::as_hms(c("00:00:00", "08:00:00", "12:00:00", "16:00:00", "24:00:00")),
-    labels = c("midnight", "8am", "noon", "4pm", "midnight")
+    breaks = hms::as_hms(c("00:00:00", "04:00:00", "08:00:00", "12:00:00", "16:00:00", "20:00:00", "24:00:00")),
+    labels = c("midnight", "4am", "8am", "noon", "4pm", "8pm", "midnight")
   ) +
   # scale_color_brewer(type = "seq", palette = "YlOrRd") +
   # scale_color_continuous(type = "viridis") +
