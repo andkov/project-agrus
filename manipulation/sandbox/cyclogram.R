@@ -85,10 +85,19 @@ ds_date <-
   dplyr::left_join(ds_date_tally, by = c("date" = "start_d")) |> 
   dplyr::mutate(
     date_index       = 0L + as.integer(difftime(date, min(date), units = "days")),
+    date_index_rev   = 0L + as.integer(difftime(max(date), date, units = "days")),
+    date_display     = sprintf("%2i/%2i", date_index, date_index_rev),
+    date_display     = 
+      dplyr::case_when(
+        date_index      == 0  ~ NA_character_,
+        date_index_rev  == 0  ~ NA_character_,
+        TRUE                  ~ date_display
+      )
   ) |>
   dplyr::mutate(
     event_tally_within_day = dplyr::if_else(1L <= date_index, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
   )
+ds_date$date_display
 
 ds_event_within_day <-
   ds_event |> 
@@ -150,14 +159,14 @@ ds_date |>
   geom_ribbon(aes(ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_faint$astronomical, color = NA) +
   geom_ribbon(aes(ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_faint$night      , color = NA) +
   
-  geom_line(  aes(y = start_astronomical), color = palette_solid$boundary, linetype = "F3"  ) +
-  geom_line(  aes(y = start_nautical    ), color = palette_solid$boundary,                  size = 1  ) +
-  geom_line(  aes(y = start_civil       ), color = palette_solid$boundary,                  size = .25) +
-  geom_line(  aes(y = sunrise           ), color = palette_solid$boundary, linetype = "F8"  ) +
-  geom_line(  aes(y = sunset            ), color = palette_solid$boundary, linetype = "F8"  ) +  
-  geom_line(  aes(y = stop_civil        ), color = palette_solid$boundary,                  size = .25) +
-  geom_line(  aes(y = stop_nautical     ), color = palette_solid$boundary,                  size = 1  ) +
-  geom_line(  aes(y = stop_astronomical ), color = palette_solid$boundary, linetype = "F3"  ) +
+  # geom_line(  aes(y = start_astronomical), color = palette_solid$boundary, linetype = "F3"  ) +
+  # geom_line(  aes(y = start_nautical    ), color = palette_solid$boundary,                  size = 1  ) +
+  # geom_line(  aes(y = start_civil       ), color = palette_solid$boundary,                  size = .25) +
+  # geom_line(  aes(y = sunrise           ), color = palette_solid$boundary, linetype = "F8"  ) +
+  # geom_line(  aes(y = sunset            ), color = palette_solid$boundary, linetype = "F8"  ) +  
+  # geom_line(  aes(y = stop_civil        ), color = palette_solid$boundary,                  size = .25) +
+  # geom_line(  aes(y = stop_nautical     ), color = palette_solid$boundary,                  size = 1  ) +
+  # geom_line(  aes(y = stop_astronomical ), color = palette_solid$boundary, linetype = "F3"  ) +
   
   geom_line(  aes(y = zenith), color = palette_solid$zenith, linetype = "a3", size = 1) +
   
@@ -168,8 +177,8 @@ ds_date |>
     size = .15
   ) +
   # geom_hline(yintercept = hms::as_hms("23:59:59"), linetype = "44", color = "#bbbbbbbb") +
-  geom_text(aes(label = date_index), y = -Inf, hjust = .01, srt = 90, size = 2, na.rm = T) +
-  geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, vjust = 1.01, na.rm = T) +
+  geom_text(aes(label = date_display), y = -Inf, hjust = .01, srt = 90, size = 2, na.rm = T) +
+  geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.0, na.rm = T) +
   scale_x_date(date_labels = "%b\n%d") +
   scale_y_time(
     breaks = hms::as_hms(c("00:00:00", "04:00:00", "08:00:00", "12:00:00", "16:00:00", "20:00:00", "24:00:00")),
