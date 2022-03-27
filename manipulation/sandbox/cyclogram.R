@@ -70,7 +70,6 @@ ds_date_sunrise <-
   ds_date_sunrise |> 
   dplyr::filter(dplyr::between(date, date_range[1] - 1L, date_range[2] + 1L))
   
-
 ds_date_tally <-
   ds_event |> 
   # ds_date_sunrise |> 
@@ -90,7 +89,6 @@ ds_date <-
   dplyr::mutate(
     event_tally_within_day = dplyr::if_else(1L <= date_index, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
   )
-
 
 ds_event_within_day <-
   ds_event |> 
@@ -135,31 +133,31 @@ palette_solid <- list(
 palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
 
 # ds_event |>
-ds_event_within_day |>
+ds_date |>
   # dplyr::select(start_d, start_t, stop_t) |> 
   # dplyr::filter(date == as.Date("2022-03-10")) |> 
   # dplyr::slice(1:2) |>
-  ggplot(aes(x = start_d)) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_solid$night       , color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_solid$astronomical, color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = start_nautical         , ymax = start_civil            ), fill = palette_solid$nautical    , color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = start_civil            , ymax = sunrise                ), fill = palette_solid$civil       , color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = sunrise                , ymax = sunset                 ), fill = palette_solid$day         , color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = sunset                 , ymax = stop_civil             ), fill = palette_solid$civil       , color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = stop_civil             , ymax = stop_nautical          ), fill = palette_solid$nautical    , color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_solid$astronomical, color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_solid$night      , color = NA) +
-  geom_line(  data = ds_date, aes(x = date, y = zenith), color = "gold", linetype = "a3", size = 1) +
+  ggplot(aes(x = date)) +
+  geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_solid$night       , color = NA) +
+  geom_ribbon(aes(ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_solid$astronomical, color = NA) +
+  geom_ribbon(aes(ymin = start_nautical         , ymax = start_civil            ), fill = palette_solid$nautical    , color = NA) +
+  geom_ribbon(aes(ymin = start_civil            , ymax = sunrise                ), fill = palette_solid$civil       , color = NA) +
+  geom_ribbon(aes(ymin = sunrise                , ymax = sunset                 ), fill = palette_solid$day         , color = NA) +
+  geom_ribbon(aes(ymin = sunset                 , ymax = stop_civil             ), fill = palette_solid$civil       , color = NA) +
+  geom_ribbon(aes(ymin = stop_civil             , ymax = stop_nautical          ), fill = palette_solid$nautical    , color = NA) +
+  geom_ribbon(aes(ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_solid$astronomical, color = NA) +
+  geom_ribbon(aes(ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_solid$night      , color = NA) +
+  geom_line(  aes(y = zenith), color = "gold", linetype = "a3", size = 1) +
   
   geom_rect(
-    aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t),
-    # color = "#bbbbbbbb", fill = "#88888888",
+    data = ds_event_within_day,
+    aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t, x = NULL),
     color = palette_solid$signal, fill = palette_faint$signal,
     size = .15
   ) +
   # geom_hline(yintercept = hms::as_hms("23:59:59"), linetype = "44", color = "#bbbbbbbb") +
-  geom_text(data = ds_date, aes(x = date, label = date_index), y = -Inf, hjust = .01, srt = 90, size = 2, na.rm = T) +
-  geom_text(data = ds_date, aes(x = date, label = event_tally_within_day, color = event_tally_within_day), y = Inf, vjust = 1.01, na.rm = T) +
+  geom_text(aes(label = date_index), y = -Inf, hjust = .01, srt = 90, size = 2, na.rm = T) +
+  geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, vjust = 1.01, na.rm = T) +
   scale_x_date(date_labels = "%b\n%d") +
   scale_y_time(
     breaks = hms::as_hms(c("00:00:00", "08:00:00", "12:00:00", "16:00:00", "24:00:00")),
