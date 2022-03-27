@@ -121,17 +121,40 @@ ds_event_within_day <-
 
 ds_event_within_day
 
+# https://www.christies.com/en/lot/lot-5388667
+# http://colrd.com/palette/19057/
+palette_solid <- list(
+  night        = "#0c2c84",
+  astronomical = "#225ea8", #  "#A1B5B9",
+  nautical     = "#1d91c0",
+  civil        = "#7fcdbb",
+  day          = "#ffffd9",
+  signal       = "#660000"  # https://colorswatches.info/color/blood-red
+)
+
+palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
+
 # ds_event |>
 ds_event_within_day |>
   # dplyr::select(start_d, start_t, stop_t) |> 
   # dplyr::filter(date == as.Date("2022-03-10")) |> 
   # dplyr::slice(1:2) |>
   ggplot(aes(x = start_d)) +
-  geom_ribbon(data = ds_date, aes(x = date, ymax = sunrise, ymin = hms::as_hms("00:00:00")), color = NA) +
-  geom_ribbon(data = ds_date, aes(x = date, ymin = sunset , ymax = hms::as_hms("24:00:00")), color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_solid$night       , color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_solid$astronomical, color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = start_nautical         , ymax = start_civil            ), fill = palette_solid$nautical    , color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = start_civil            , ymax = sunrise                ), fill = palette_solid$civil       , color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = sunrise                , ymax = sunset                 ), fill = palette_solid$day         , color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = sunset                 , ymax = stop_civil             ), fill = palette_solid$civil       , color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = stop_civil             , ymax = stop_nautical          ), fill = palette_solid$nautical    , color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_solid$astronomical, color = NA) +
+  geom_ribbon(data = ds_date, aes(x = date, ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_solid$night      , color = NA) +
+  geom_line(  data = ds_date, aes(x = date, y = zenith), color = "gold", linetype = "a3", size = 1) +
+  
   geom_rect(
     aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t),
-    color = "#bbbbbbbb", fill = "#88888888",
+    # color = "#bbbbbbbb", fill = "#88888888",
+    color = palette_solid$signal, fill = palette_faint$signal,
     size = .15
   ) +
   # geom_hline(yintercept = hms::as_hms("23:59:59"), linetype = "44", color = "#bbbbbbbb") +
