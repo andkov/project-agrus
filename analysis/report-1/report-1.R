@@ -68,19 +68,37 @@ ds_date_sunrise <-
   ds_date_sunrise |> 
   dplyr::filter(dplyr::between(date, date_range[1] - 1L, date_range[2] + 1L))
 
-
-ds_day <- 
+ds_date_tally <-
   ds_event |> 
+  # ds_date_sunrise |> 
+  # # dplyr::left_join(ds_event, by = c("date" = "start_d")) |> 
   dplyr::group_by(start_d) |> 
   dplyr::summarize(
     event_tally_within_day = dplyr::n()
     ,duration_total_day = sum(duration_minutes)
     ,duration_mean_day = mean(duration_minutes)
-  ) |> 
-  dplyr::ungroup() |> 
+  )|> 
+  dplyr::ungroup()
+
+ds_date <-
+  ds_date_sunrise |>
+  dplyr::left_join(ds_date_tally, by = c("date" = "start_d")) |> 
   dplyr::mutate(
-    date_index       = 1L +as.integer(difftime(start_d, min(start_d), units = "days")),
+    date_index       = 0L + as.integer(difftime(date, min(date), units = "days")),
+    date_index_rev   = 0L + as.integer(difftime(max(date), date, units = "days")),
+    # date_display     = sprintf("%2i/%2i", date_index, date_index_rev),
+    date_display     = sprintf("%2i\n%2i", date_index, date_index_rev),
+    date_display     = 
+      dplyr::case_when(
+        date_index      == 0  ~ NA_character_,
+        date_index_rev  == 0  ~ NA_character_,
+        TRUE                  ~ date_display
+      )
+  ) |>
+  dplyr::mutate(
+    event_tally_within_day = dplyr::if_else(1L <= date_index, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
   )
+ds_date$date_display
 
 ds_event_within_day <-
   ds_event |> 
@@ -111,42 +129,112 @@ ds_event_within_day <-
 
 ds_event_within_day
 
-
 # ---- graph-1 -----------------------------------------------------------------
+# https://www.christies.com/en/lot/lot-5388667
+# http://colrd.com/palette/19057/
+palette_solid <- list(
+  night        = "#0c2c84",
+  astronomical = "#225ea8", #  "#A1B5B9",
+  nautical     = "#1d91c0",
+  civil        = "#7fcdbb",
+  day          = "#ffffd9",
+  signal       = "#660000",  # https://colorswatches.info/color/blood-red
+  boundary     = "gray20",
+  zenith       = "gold"
+)
+
+palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
+
 g1 <- 
-  ds_event_within_day |>
+  ds_date |>
+  # mutate(
+  #   zenith2 = hms::as_hms("12:2")
+  # )
   # dplyr::select(start_d, start_t, stop_t) |> 
   # dplyr::filter(date == as.Date("2022-03-10")) |> 
   # dplyr::slice(1:2) |>
-  ggplot(aes(x = start_d)) +
-  geom_ribbon(data = ds_date_sunrise, aes(x = date, ymax = sunrise, ymin = hms::as_hms("00:00:00"))) +
-  geom_ribbon(data = ds_date_sunrise, aes(x = date, ymin = sunset , ymax = hms::as_hms("24:00:00"))) +
+  ggplot(aes(x = date)) +
+  geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_faint$night       , color = NA) +
+  geom_ribbon(aes(ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_faint$astronomical, color = NA) +
+  geom_ribbon(aes(ymin = start_nautical         , ymax = start_civil            ), fill = palette_faint$nautical    , color = NA) +
+  geom_ribbon(aes(ymin = start_civil            , ymax = sunrise                ), fill = palette_faint$civil       , color = NA) +
+  geom_ribbon(aes(ymin = sunrise                , ymax = sunset                 ), fill = palette_faint$day         , color = NA) +
+  geom_ribbon(aes(ymin = sunset                 , ymax = stop_civil             ), fill = palette_faint$civil       , color = NA) +
+  geom_ribbon(aes(ymin = stop_civil             , ymax = stop_nautical          ), fill = palette_faint$nautical    , color = NA) +
+  geom_ribbon(aes(ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_faint$astronomical, color = NA) +
+  geom_ribbon(aes(ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_faint$night      , color = NA) +
+  
+  # geom_line(  aes(y = start_astronomical), color = palette_solid$boundary, linetype = "F3"  ) +
+  # geom_line(  aes(y = start_nautical    ), color = palette_solid$boundary,                  size = 1  ) +
+  # geom_line(  aes(y = start_civil       ), color = palette_solid$boundary,                  size = .25) +
+  # geom_line(  aes(y = sunrise           ), color = palette_solid$boundary, linetype = "F8"  ) +
+  # geom_line(  aes(y = sunset            ), color = palette_solid$boundary, linetype = "F8"  ) +  
+  # geom_line(  aes(y = stop_civil        ), color = palette_solid$boundary,                  size = .25) +
+  # geom_line(  aes(y = stop_nautical     ), color = palette_solid$boundary,                  size = 1  ) +
+  # geom_line(  aes(y = stop_astronomical ), color = palette_solid$boundary, linetype = "F3"  ) +
+  
+  # geom_line(  aes(y = zenith), color = palette_solid$zenith, linetype = "a3", size = 1) +
+  geom_line(  aes(y = zenith), color = palette_solid$zenith, linetype = "solid", size = .4) +
+  
   geom_rect(
-    aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t),
-    color = "#bbbbbbbb", fill = "#88888888"
+    data = ds_event_within_day,
+    aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t, x = NULL),
+    color = palette_solid$signal, fill = palette_faint$signal,
+    size = .15
   ) +
-  geom_hline(yintercept = hms::as_hms("23:59:59"), linetype = "44", color = "#bbbbbbbb") +
-  geom_text(data = ds_day, aes(label = date_index), y = -Inf, hjust = .01, srt = 90, size = 3) +
-  geom_text(data = ds_day, aes(label = event_tally_within_day), y = Inf, vjust = 1.01) +
-  geom_text(label = "Доба\nспротиву",x =-Inf, y = -Inf, vjust = -.2, hjust = 0, size = 3)+
-  geom_text(label = "Кількість\nтривог",x =-Inf, y = Inf,vjust = 1, hjust = 0, size = 3)+
-  scale_y_time(breaks = ) +
+  geom_text(aes(label = date_display), y = -Inf, hjust = .5, srt = 0, size = 1.5, na.rm = T, vjust=0,color ="grey60") +
+  geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
+  geom_text(label = "Кількість\nтривог   ",x =Inf, y = Inf,vjust = .95, hjust = 1 , size = 2, color = "grey80", lineheight=.8)+
+  # geom_text(label = "Доба\nспротиву",x =-Inf, y = -Inf, vjust = -.1, hjust = .02, size = 2, color = "grey80")+
+  geom_text(label = "Доба      \nспротиву",x =Inf, y = -Inf, vjust = -.06, hjust = 1, size = 1.8, color = "grey80",lineheight = .8)+
+  # geom_text(aes(y=zenith),label = "Зеніт",x =as.Date("2022-03-17"),size=2, color = "grey80")+
+  # geom_text(y=hms::as_hms("12:00:00"),label = "Зеніт",x =as.Date("2022-03-17"),size=2, color = "grey80")+
+  # geom_text(label = "Зеніт",x =as.Date("2022-03-17"), y = 90)+
+  # geom_text(label = "Зеніт",x =as.Date("2022-03-17"), y = 90)+
+  # geom_text(label = "Зеніт",x =as.Date("2022-03-17"), y = 90)+
+  scale_x_date(
+    date_labels = "%b\n%d", date_breaks = "1 week", date_minor_breaks = "1 week"
+    # ,limits = as.Date(c("2022-02-25","2022-03-25"))
+    ,expand = expansion(mult=c(.02,.05))
+    ) +
+  scale_y_time(
+    breaks = hms::as_hms(c("00:00:00", "04:00:00", "08:00:00", "12:00:00", "16:00:00", "20:00:00", "24:00:00")),
+    labels = c("0", "4", "8", "12", "16", "20", "24")
+  ) +
+  # scale_color_brewer(type = "seq", palette = "YlOrRd") +
+  # scale_color_continuous(type = "viridis") +
+  scale_colour_viridis_b(direction = -1) +
   coord_cartesian(ylim = hms::parse_hms(c("00:00:00", "23:59:59"))) +
   theme_minimal() +
   labs(
     title = "Тривалисть та частота повітряних тривог у м.Вінниця"
-    ,caption = "1)Понеділки позначені датами\ncreated by @andkov and @wibeasley"
+    # ,subtitle = "м.Вінниця, перший місяць війни 2022 року"
+    ,caption = "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
     ,x = NULL
     ,y = "Година доби"
-  )
-
+  )+
+  theme(
+    legend.position = "none"
+    ,plot.title = element_text(size=10)
+    ,plot.caption = element_text(size=5, color = "grey70")
+    ,axis.title.y = element_text(size=7,color = "grey60")
+    ,axis.text.x = element_text(color = "grey10")
+    ,axis.text.y = element_text(color = "grey60")
+  ) 
 g1
-g1 %>% quick_save("1-cyclogram",width=9, height=5)
+ggsave(
+  plot = g1,
+  filename = "analysis/report-1/prints/cyclogram.png",
+  height   = 4,
+  width    = 5,
+  dpi      = 400,
+  bg       = "white"
+)
 
 
 # ---- graph-2 -----------------------------------------------------------------
 d2 <- 
-  ds_day %>% 
+  ds_date_tally %>% 
   tidyr::pivot_longer(
     cols = c("event_tally_within_day","duration_total_day","duration_mean_day" )
     ,names_to = "measure"
