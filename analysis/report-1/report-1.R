@@ -92,10 +92,10 @@ ds_date <-
       date == as.Date("2022-03-02") ~ " Березень",
       TRUE ~ " "
     ),
-    date_display     = sprintf("%2i/%2i", date_index, date_index_rev),
+    # date_display     = sprintf("%2i/%2i", date_index, date_index_rev),
     # date_display     = sprintf("%2i\n%2i", date_index, date_index_rev),
     # date_display     = sprintf("%2s\n%2s\n%s", as.character(date_index), as.character(date_of_month),month_name),
-    date_display     = sprintf("%2i", date_index),
+    date_display     = sprintf("%2i", date_index+1),
     date_display     =
       dplyr::case_when(
         date_index      == 0  ~ NA_character_,
@@ -216,25 +216,33 @@ g1 <-
     # , fill = palette_faint$signal,
     ,size = .15
   ) +
-  geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="grey80") +
+  geom_text(aes(x=as.Date("2022-03-12")),label = "\U2193 Доба після другого вторгнення \U2193", y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
+  geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
   geom_text(aes(label = date_display2), y = -Inf, hjust = .5, vjust=-.2,  srt = 0, size = 1.6, na.rm = T, color ="grey40") +
   
-  geom_text(label = "№",x =-Inf, y = -Inf, vjust = -4.5, hjust = -.6, size = 1.6, color = "grey80",lineheight = .8)+
+  # geom_text(label = "№",x =-Inf, y = -Inf, vjust = -4.5, hjust = -.6, size = 1.6, color = "grey80",lineheight = .8)+
   # geom_text(label = "день",x =-Inf, y = -Inf, vjust = -6, hjust = -1.1, size = 1.5, color = "grey80",lineheight = .8)+
   # geom_text(label = "дата",x =-Inf, y = -Inf, vjust = -1.4, hjust = -1.1, size = 1.5, color = "grey80",lineheight = .8)+
   
-  geom_text(label = "Кількість разів \U2191",x =-Inf, y = Inf,vjust = 3.8, hjust = -.2 , size = 2, color = "white", lineheight=.8)+
+  geom_text(aes(x=as.Date("2022-03-11")),label = "\U2191 Кількість повітряних тривог за добу \U2191", y = Inf,vjust = 3.8, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
   
   geom_text(label = " зеніт",        x =as.Date("2022-02-25"), aes(y = hms::parse_hms("12:50:00")), color ="white", size =3)+
-  geom_text(label = "сутінки",      x =as.Date("2022-03-09"), aes(y = hms::parse_hms("20:05:00")), color ="white", size =1.8,srt=2)+
-  geom_text(label = "астрономічнi", x =as.Date("2022-03-10"), aes(y = hms::parse_hms("19:35:00")), color ="white", size =1.8,srt=3)+
-  geom_text(label = "морськi",      x =as.Date("2022-03-11"), aes(y = hms::parse_hms("19:05:00")), color ="white", size =1.8,srt=3)+
-  geom_text(label = "цивільнi",     x =as.Date("2022-03-11"), aes(y = hms::parse_hms("18:35:00")), color ="white", size =1.8,srt=3)+
-  geom_text(label = "цивільний",    x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3)+
-  geom_text(label = "морський",     x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3)+
-  geom_text(label = "астрономічний",x =as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3)+
-  geom_text(label = "світанок",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("04:45:00")), color ="white", size =1.8,srt=-3)+
+ 
+  geom_text(label = "сутінки",      x =as.Date("2022-02-25"), aes(y = hms::parse_hms("20:00:00")), color ="white", size =1.8,srt=2)+
+  geom_text(label = "астрономічнi", x =as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=2,hjust=.55)+
+  geom_text(label = "морськi",      x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=3,hjust=1)+
+  geom_text(label = "цивільнi",     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=3)+
+  
+  # geom_text(label = "сутінки",      x =as.Date("2022-03-09"), aes(y = hms::parse_hms("20:05:00")), color ="white", size =1.8,srt=2)+
+  # geom_text(label = "астрономічнi", x =as.Date("2022-03-10"), aes(y = hms::parse_hms("19:35:00")), color ="white", size =1.8,srt=3)+
+  # geom_text(label = "морськi",      x =as.Date("2022-03-11"), aes(y = hms::parse_hms("19:05:00")), color ="white", size =1.8,srt=3)+
+  # geom_text(label = "цивільнi",     x =as.Date("2022-03-11"), aes(y = hms::parse_hms("18:35:00")), color ="white", size =1.8,srt=3)+
+  geom_text(label = "цивільний",    x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3,hjust=.7)+
+  geom_text(label = "морський",     x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3,hjust=.7)+
+  geom_text(label = "астрономічний",x =as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3,hjust=.7)+
+  geom_text(label = "світанок",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("04:45:00")), color ="white", size =1.8,srt=-3,hjust=.85)+
+ 
   
   geom_text(label = "Пт",     x =as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
   geom_text(label = "Сб",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
