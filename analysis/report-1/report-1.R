@@ -86,18 +86,37 @@ ds_date <-
   dplyr::mutate(
     date_index       = 0L + as.integer(difftime(date, min(date), units = "days")),
     date_index_rev   = 0L + as.integer(difftime(max(date), date, units = "days")),
-    # date_display     = sprintf("%2i/%2i", date_index, date_index_rev),
-    date_display     = sprintf("%2i\n%2i", date_index, date_index_rev),
-    date_display     = 
+    date_of_month    = strftime(date, "%d") %>% as.integer(),
+    month_name       = case_when(
+      date == as.Date("2022-02-28") ~ "Лютий       ",
+      date == as.Date("2022-03-02") ~ "Березень   ",
+      TRUE ~ " "
+    ),
+    date_display     = sprintf("%2i/%2i", date_index, date_index_rev),
+    # date_display     = sprintf("%2i\n%2i", date_index, date_index_rev),
+    # date_display     = sprintf("%2s\n%2s\n%s", as.character(date_index), as.character(date_of_month),month_name),
+    date_display     = sprintf("%2i", date_index),
+    date_display     =
       dplyr::case_when(
         date_index      == 0  ~ NA_character_,
         date_index_rev  == 0  ~ NA_character_,
         TRUE                  ~ date_display
+      ),
+    
+    date_display2     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
+    date_display2     =
+      dplyr::case_when(
+        date_index      == 0  ~ NA_character_,
+        date_index_rev  == 0  ~ NA_character_,
+        TRUE                  ~ date_display2
       )
+    
+    
   ) |>
   dplyr::mutate(
-    event_tally_within_day = dplyr::if_else(1L <= date_index, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
+    event_tally_within_day = dplyr::if_else(1L <= date_index & 1L <= date_index_rev, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
   )
+ds_date %>% glimpse()
 ds_date$date_display
 
 ds_event_within_day <-
@@ -132,15 +151,33 @@ ds_event_within_day
 # ---- graph-1 -----------------------------------------------------------------
 # https://www.christies.com/en/lot/lot-5388667
 # http://colrd.com/palette/19057/
+# palette_solid <- list(
+#   night        = "#0c2c84",
+#   astronomical = "#225ea8", #  "#A1B5B9",
+#   nautical     = "#1d91c0",
+#   civil        = "#7fcdbb",
+#   day          = "#ffffd9",
+#   signal       = "#660000",  # https://colorswatches.info/color/blood-red
+#   boundary     = "gray20",
+#   zenith       = "gold"
+# )
+ukraine_blue <-   "#0057b7"
+ukraine_yellow <- "#ffd700"
+
+
+
 palette_solid <- list(
-  night        = "#0c2c84",
-  astronomical = "#225ea8", #  "#A1B5B9",
-  nautical     = "#1d91c0",
-  civil        = "#7fcdbb",
-  day          = "#ffffd9",
-  signal       = "#660000",  # https://colorswatches.info/color/blood-red
+  night        = ukraine_blue,
+  # astronomical = scales::alpha(ukraine_blue, alpha = .5),
+  astronomical = colorspace::lighten(ukraine_blue,  amount = .12,space = "HLS"),
+  nautical     =  colorspace::lighten(ukraine_blue, amount = .24,space = "HLS"),
+  civil        =  colorspace::lighten(ukraine_blue, amount = .36,space = "HLS"),
+  day          = ukraine_yellow,
+  # signal       = "#660000",  # https://colorswatches.info/color/blood-red
+  # signal       = "black",  # https://colorswatches.info/color/blood-red
+  signal       = "#DB0D20",  # scarlet from russian flag
   boundary     = "gray20",
-  zenith       = "gold"
+  zenith       = "white"
 )
 
 palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
@@ -179,27 +216,42 @@ g1 <-
   geom_rect(
     data = ds_event_within_day,
     aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t, x = NULL),
-    color = palette_solid$signal, fill = palette_faint$signal,
+    color = "black"
+    # color = palette_solid$signal
+    , fill = palette_faint$signal,
     size = .15
   ) +
-  geom_text(aes(label = date_display), y = -Inf, hjust = .5, srt = 0, size = 1.5, na.rm = T, vjust=0,color ="grey60") +
+  geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="grey80") +
+  geom_text(aes(label = date_display2), y = -Inf, hjust = .5, vjust=-.2,  srt = 0, size = 1.6, na.rm = T, color ="grey40") +
+  
+  geom_text(label = "№",x =-Inf, y = -Inf, vjust = -4.5, hjust = -.6, size = 1.6, color = "grey80",lineheight = .8)+
+  # geom_text(label = "день",x =-Inf, y = -Inf, vjust = -6, hjust = -1.1, size = 1.5, color = "grey80",lineheight = .8)+
+  # geom_text(label = "дата",x =-Inf, y = -Inf, vjust = -1.4, hjust = -1.1, size = 1.5, color = "grey80",lineheight = .8)+
+  
+  geom_text(label = "Кількість",x =-Inf, y = Inf,vjust = 1.6, hjust = 1 , size = 2, color = "grey80", lineheight=.8)+
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
-  geom_text(label = "Кількість\nтривог   ",x =Inf, y = Inf,vjust = .95, hjust = 1 , size = 2, color = "grey80", lineheight=.8)+
-  # geom_text(label = "Доба\nспротиву",x =-Inf, y = -Inf, vjust = -.1, hjust = .02, size = 2, color = "grey80")+
-  geom_text(label = "Доба      \nспротиву",x =Inf, y = -Inf, vjust = -.06, hjust = 1, size = 1.8, color = "grey80",lineheight = .8)+
-  # geom_text(aes(y=zenith),label = "Зеніт",x =as.Date("2022-03-17"),size=2, color = "grey80")+
-  # geom_text(y=hms::as_hms("12:00:00"),label = "Зеніт",x =as.Date("2022-03-17"),size=2, color = "grey80")+
-  # geom_text(label = "Зеніт",x =as.Date("2022-03-17"), y = 90)+
-  # geom_text(label = "Зеніт",x =as.Date("2022-03-17"), y = 90)+
-  # geom_text(label = "Зеніт",x =as.Date("2022-03-17"), y = 90)+
+  
+  geom_text(label = "зеніт",        x =as.Date("2022-03-17"), aes(y = hms::parse_hms("12:50:00")), color ="white", size =3.5)+
+  geom_text(label = "сутінки",      x =as.Date("2022-03-19"), aes(y = hms::parse_hms("20:30:00")), color ="white", size =1.8)+
+  geom_text(label = "астрономічнi", x =as.Date("2022-03-18"), aes(y = hms::parse_hms("19:50:00")), color ="white", size =1.8)+
+  geom_text(label = "морськi",      x =as.Date("2022-03-18"), aes(y = hms::parse_hms("19:10:00")), color ="white", size =1.8)+
+  geom_text(label = "цивільнi",     x =as.Date("2022-03-18"), aes(y = hms::parse_hms("18:35:00")), color ="white", size =1.8)+
+  geom_text(label = "цивільний",    x =as.Date("2022-03-18"), aes(y = hms::parse_hms("06:02:00")), color ="white", size =1.8)+
+  geom_text(label = "морський",     x =as.Date("2022-03-18"), aes(y = hms::parse_hms("05:27:00")), color ="white", size =1.8)+
+  geom_text(label = "астрономічний",x =as.Date("2022-03-18"), aes(y = hms::parse_hms("04:50:00")), color ="white", size =1.8)+
+  geom_text(label = "світанок",     x =as.Date("2022-03-19"), aes(y = hms::parse_hms("04:00:00")), color ="white", size =1.8)+
+  #https://uk.wikipedia.org/wiki/%D0%A1%D0%B2%D1%96%D1%82%D0%B0%D0%BD%D0%BE%D0%BA
   scale_x_date(
     date_labels = "%b\n%d", date_breaks = "1 week", date_minor_breaks = "1 week"
     # ,limits = as.Date(c("2022-02-25","2022-03-25"))
-    ,expand = expansion(mult=c(.02,.05))
+    ,expand = expansion(mult=c(0,.05))
     ) +
   scale_y_time(
     breaks = hms::as_hms(c("00:00:00", "04:00:00", "08:00:00", "12:00:00", "16:00:00", "20:00:00", "24:00:00")),
-    labels = c("0", "4", "8", "12", "16", "20", "24")
+    # minor_breaks = hms::as_hms(c("01:00:00", "02:00:00", "03:00:00", "05:00:00", "06:00:00", "07:00:00", "09:00:00")),
+    labels = c("00", "04", "08", "12", "16", "20", "24")
+    ,expand = expansion(mult=c(.06,.045))
+    # ,sec.axis = sec_axis(name="Secondary")
   ) +
   # scale_color_brewer(type = "seq", palette = "YlOrRd") +
   # scale_color_continuous(type = "viridis") +
@@ -218,8 +270,14 @@ g1 <-
     ,plot.title = element_text(size=10)
     ,plot.caption = element_text(size=5, color = "grey70")
     ,axis.title.y = element_text(size=7,color = "grey60")
-    ,axis.text.x = element_text(color = "grey10")
-    ,axis.text.y = element_text(color = "grey60")
+    # ,axis.text.x = element_text(color = "grey10")
+    ,axis.text.x = element_blank()
+    ,axis.text.y = element_text(color = "grey60",family = "mono")
+    # ,plot.margin = margin(20,20,20,20)
+    # ,plot.background = element_rect(fill = "white", color = "black", size = 0) 
+    # axis.l = element_text(margin=margin(t=20)
+    ,panel.grid = element_blank()
+    ,axis.ticks.y = element_line(size =.1)
   ) 
 g1
 ggsave(
