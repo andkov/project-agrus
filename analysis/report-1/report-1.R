@@ -144,9 +144,10 @@ ds_event_within_day <-
     start_d     = as.Date(start_dt),
     start_t     = hms::as_hms(start_dt),
     stop_t      = hms::as_hms(stop_dt),
+    weekend     = lubridate::wday(start_d) %in% c(1,7)
   )
 
-ds_event_within_day
+ds_event_within_day %>% glimpse()
 
 # ---- graph-1 -----------------------------------------------------------------
 # https://www.christies.com/en/lot/lot-5388667
@@ -161,9 +162,9 @@ ds_event_within_day
 #   boundary     = "gray20",
 #   zenith       = "gold"
 # )
-ukraine_blue <-   "#0057b7"
-ukraine_yellow <- "#ffd700"
-
+ukraine_blue    <-   "#0057b7"
+ukraine_yellow  <- "#ffd700"
+russian_red <- "#DB0D20"
 
 
 palette_solid <- list(
@@ -175,7 +176,8 @@ palette_solid <- list(
   day          = ukraine_yellow,
   # signal       = "#660000",  # https://colorswatches.info/color/blood-red
   # signal       = "black",  # https://colorswatches.info/color/blood-red
-  signal       = "#DB0D20",  # scarlet from russian flag
+  signal       = russian_red,  # scarlet from russian flag
+  signal2       = colorspace::lighten(russian_red,  amount = .20,space = "HLS"),  # scarlet from russian flag
   boundary     = "gray20",
   zenith       = "white"
 )
@@ -200,25 +202,16 @@ g1 <-
   geom_ribbon(aes(ymin = stop_civil             , ymax = stop_nautical          ), fill = palette_faint$nautical    , color = NA) +
   geom_ribbon(aes(ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_faint$astronomical, color = NA) +
   geom_ribbon(aes(ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_faint$night      , color = NA) +
-  
-  # geom_line(  aes(y = start_astronomical), color = palette_solid$boundary, linetype = "F3"  ) +
-  # geom_line(  aes(y = start_nautical    ), color = palette_solid$boundary,                  size = 1  ) +
-  # geom_line(  aes(y = start_civil       ), color = palette_solid$boundary,                  size = .25) +
-  # geom_line(  aes(y = sunrise           ), color = palette_solid$boundary, linetype = "F8"  ) +
-  # geom_line(  aes(y = sunset            ), color = palette_solid$boundary, linetype = "F8"  ) +  
-  # geom_line(  aes(y = stop_civil        ), color = palette_solid$boundary,                  size = .25) +
-  # geom_line(  aes(y = stop_nautical     ), color = palette_solid$boundary,                  size = 1  ) +
-  # geom_line(  aes(y = stop_astronomical ), color = palette_solid$boundary, linetype = "F3"  ) +
-  
-  # geom_line(  aes(y = zenith), color = palette_solid$zenith, linetype = "a3", size = 1) +
+
+
   geom_line(  aes(y = zenith), color = palette_solid$zenith, linetype = "solid", size = .4) +
   
   geom_rect(
     data = ds_event_within_day,
-    aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t, x = NULL),
+    aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t, x = NULL, fill = weekend),
     color = "black"
     # color = palette_solid$signal
-    , fill = palette_faint$signal,
+    # , fill = palette_faint$signal,
     size = .15
   ) +
   geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="grey80") +
@@ -253,6 +246,7 @@ g1 <-
     ,expand = expansion(mult=c(.06,.045))
     # ,sec.axis = sec_axis(name="Secondary")
   ) +
+  scale_fill_manual(values = c("TRUE"=palette_faint$signal2, "FALSE"=palette_faint$signal))+
   # scale_color_brewer(type = "seq", palette = "YlOrRd") +
   # scale_color_continuous(type = "viridis") +
   scale_colour_viridis_b(direction = -1) +
