@@ -90,6 +90,7 @@ ds_date <-
     month_name       = case_when(
       date == as.Date("2022-02-26") ~ "Лютий 2022",
       date == as.Date("2022-03-02") ~ " Березень",
+      date == as.Date("2022-04-02") ~ " Квітень",
       TRUE ~ " "
     ),
     # date_display     = sprintf("%2i/%2i", date_index, date_index_rev),
@@ -181,7 +182,10 @@ palette_solid <- list(
   # signal2       = colorspace::darken(russian_red,  amount = .60,space = "HLS"),  # scarlet from russian flag
   signal2       = colorspace::lighten(russian_red,  amount = .30,space = "HLS"),  # scarlet from russian flag
   boundary     = "gray20",
-  zenith       = "white"
+  # zenith       = "white"
+  # zenith       = colorspace::darken(ukraine_yellow, amount = .10,space = "HLS")
+  # zenith       = colorspace::darken(ukraine_yellow, amount = .15,space = "HLS")
+  zenith       = "grey97"
 )
 
 palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
@@ -227,21 +231,21 @@ g1 <-
   geom_text(aes(x=as.Date("2022-03-11")),label = "\U2191 Кількість повітряних тривог за добу \U2191", y = Inf,vjust = 3.8, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
   
-  geom_text(label = " зеніт",        x =as.Date("2022-02-25"), aes(y = hms::parse_hms("12:50:00")), color ="white", size =3)+
+  geom_text(label = " зеніт",        x =as.Date("2022-02-25"), aes(y = hms::parse_hms("12:50:00")), color =palette_solid$zenith, size =3)+
  
-  geom_text(label = "сутінки",      x =as.Date("2022-02-25"), aes(y = hms::parse_hms("20:00:00")), color ="white", size =1.8,srt=2)+
-  geom_text(label = "астрономічнi", x =as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=2,hjust=.55)+
+  # geom_text(label = "сутінки",      x =as.Date("2022-02-25"), aes(y = hms::parse_hms("20:00:00")), color ="white", size =1.8,srt=2,hjust=.3)+
+  geom_text(label = "астрономічнi", x =as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=2,hjust=.35)+
   geom_text(label = "морськi",      x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=3,hjust=1)+
-  geom_text(label = "цивільнi",     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=3)+
+  geom_text(label = "цивільнi сутінки",     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=3,hjust=.2)+
   
   # geom_text(label = "сутінки",      x =as.Date("2022-03-09"), aes(y = hms::parse_hms("20:05:00")), color ="white", size =1.8,srt=2)+
   # geom_text(label = "астрономічнi", x =as.Date("2022-03-10"), aes(y = hms::parse_hms("19:35:00")), color ="white", size =1.8,srt=3)+
   # geom_text(label = "морськi",      x =as.Date("2022-03-11"), aes(y = hms::parse_hms("19:05:00")), color ="white", size =1.8,srt=3)+
   # geom_text(label = "цивільнi",     x =as.Date("2022-03-11"), aes(y = hms::parse_hms("18:35:00")), color ="white", size =1.8,srt=3)+
-  geom_text(label = "цивільний",    x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3,hjust=.7)+
+  geom_text(label = "цивільний світанок",    x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3,hjust=.5)+
   geom_text(label = "морський",     x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3,hjust=1.15)+
-  geom_text(label = "астрономічний",x =as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3,hjust=.7)+
-  geom_text(label = "світанок",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("04:45:00")), color ="white", size =1.8,srt=-3,hjust=.85)+
+  geom_text(label = "астрономічний",x =as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3,hjust=.6)+
+  # geom_text(label = "світанок",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("04:45:00")), color ="white", size =1.8,srt=-3,hjust=.65)+
  
   
   geom_text(label = "Пт",     x =as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
@@ -294,7 +298,7 @@ g1 <-
 g1
 ggsave(
   plot = g1,
-  filename = "analysis/report-1/prints/cyclogram.png",
+  filename = "analysis/report-1/prints/1-cyclogram.png",
   height   = 4,
   width    = 5,
   dpi      = 400,
