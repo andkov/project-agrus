@@ -325,12 +325,12 @@ d2 <-
 g2 <-
   d2 %>% 
   ggplot(aes(x=start_d, y = value))+
-  geom_line()+
-  geom_point()+
+  geom_line(size=.4,linetype="dotted")+
+  geom_point(shape = 21, size = 3,fill=russian_red, color = "black", alpha = .4)+
   # geom_text(aes(label = date_index), y = -Inf, vjust = -.01) +
   # geom_text( aes(label = round(value,0)), y = Inf,xjust = 2.11, angle = -90) +
   # scale_y_continuous(expand = expansion(mult = c(0,lk1.1)))+
-  geom_smooth()+
+  geom_smooth(color=ukraine_blue, method = "loess")+
   scale_x_date(date_breaks = "1 week", minor_breaks = "1 day",date_labels = "%b-%d")+
   facet_wrap(
     facets = "measure"
@@ -342,7 +342,7 @@ g2 <-
   labs(
     title = "Статистика повітряних тривог у місті Вінниця"
     ,subtitle = "Зведення за кожну добу (0-24)"
-    ,caption = "1)Понеділки позначені датами 2) Тривога зараховується до доби у яку почалась\n created by @andkov and @wibeasley"
+    ,caption = "1)Понеділки позначені датами 2) Тривога зараховується до доби у яку почалась\n  Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych "
     ,x = NULL
     ,y = "Значення"
   )
