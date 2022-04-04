@@ -114,19 +114,19 @@ ds3 %>% glimpse()
 
 # ---- graph-2 -----------------------------------------------------------------
 
-# ---- save-to-disk ------------------------------------------------------------
-# naming convention: step_id - step_name - cohort_id
-path_data_out <- "./data-unshared/derived/.../0-import-1.rds"
-# ---- publish -----------------------------------------------------------------
-# naming convention: step_id - data_transfer_object - cohort_id
-# one report (.Rmd) per script (.R), unless report series
-path_report_out <- "./manipulation/reports/0-import-1/0-import-1.Rmd"
-rmarkdown::render(
-  input = path_report_out ,
-  output_format=c(
-    "html_document"
-    # "word_document"
-    # "pdf_document"
-  ),
-  clean=TRUE
-)
+# # ---- save-to-disk ------------------------------------------------------------
+# # naming convention: step_id - step_name - cohort_id
+# path_data_out <- "./data-unshared/derived/.../0-import-1.rds"
+# # ---- publish -----------------------------------------------------------------
+# # naming convention: step_id - data_transfer_object - cohort_id
+# # one report (.Rmd) per script (.R), unless report series
+# path_report_out <- "./manipulation/reports/0-import-1/0-import-1.Rmd"
+# rmarkdown::render(
+#   input = path_report_out ,
+#   output_format=c(
+#     "html_document"
+#     # "word_document"
+#     # "pdf_document"
+#   ),
+#   clean=TRUE
+# )

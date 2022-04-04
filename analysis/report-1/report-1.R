@@ -1,5 +1,5 @@
 rm(list = ls(all.names = TRUE)) # Clear the memory of variables from previous run. This is not called by knitr, because it's above the first chunk.
-cat("\014") # Clear the console
+# cat("\014") # Clear the console
 
 # verify root location
 cat("Working directory: ", getwd()) # Must be set to Project Directory
@@ -26,9 +26,6 @@ config                         <- config::get()
 # custom function for HTML tables
 
 prints_folder <- paste0("./analysis/report-1/prints/")
-if(!file.exists(prints_folder)){
-  dir.create(file.path(prints_folder))
-}
 
 # store script-specific function here
 # OuhscMunge::readr_spec_aligned("data-public/raw/data-input.csv")
@@ -82,7 +79,7 @@ ds_date_tally <-
 
 ds_date <-
   ds_date_sunrise |>
-  dplyr::left_join(ds_date_tally, by = c("date" = "start_d")) |> 
+  dplyr::left_join(ds_date_tally, by = c("date" = "start_d")) |>
   dplyr::mutate(
     date_index       = 0L + as.integer(difftime(date, min(date), units = "days")),
     date_index_rev   = 0L + as.integer(difftime(max(date), date, units = "days")),
@@ -103,7 +100,7 @@ ds_date <-
         date_index_rev  == 0  ~ NA_character_,
         TRUE                  ~ date_display
       ),
-    
+
     date_display2     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
     date_display2     =
       dplyr::case_when(
@@ -111,8 +108,8 @@ ds_date <-
         date_index_rev  == 0  ~ NA_character_,
         TRUE                  ~ date_display2
       )
-    
-    
+
+
   ) |>
   dplyr::mutate(
     event_tally_within_day = dplyr::if_else(1L <= date_index & 1L <= date_index_rev, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
@@ -121,26 +118,26 @@ ds_date %>% glimpse()
 ds_date$date_display
 
 ds_event_within_day <-
-  ds_event |> 
+  ds_event |>
   dplyr::select(
     event_id,
     start_dt,
     stop_dt,
-  ) |> 
+  ) |>
   dplyr::mutate(
     # crosses_midnight   = as.Date(start_d) < as.Date(stop_d),
     days   = 1L + as.integer(difftime(as.Date(stop_dt), as.Date(start_dt), units = "days")),
-  ) |> 
-  tidyr::uncount(days, .remove = FALSE, .id = "day_within_event") |> 
+  ) |>
+  tidyr::uncount(days, .remove = FALSE, .id = "day_within_event") |>
   dplyr::mutate(
     # day_within_event_rev = days - day_within_event + 1L,
     day_first = (day_within_event == 1L),
     day_last  = (day_within_event == days),
-  ) |> 
+  ) |>
   dplyr::mutate(
     start_dt  = dplyr::if_else(day_first, start_dt, as.Date(stop_dt) + lubridate::seconds(1)),
     stop_dt   = dplyr::if_else(day_last , stop_dt , as.Date(stop_dt) - lubridate::seconds(1))
-  ) |> 
+  ) |>
   dplyr::mutate(
     start_d     = as.Date(start_dt),
     start_t     = hms::as_hms(start_dt),
@@ -190,13 +187,13 @@ palette_solid <- list(
 
 palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
 
-g1 <- 
+g1 <-
   ds_date |>
   # mutate(
   #   zenith2 = hms::as_hms("12:2")
   # )
-  # dplyr::select(start_d, start_t, stop_t) |> 
-  # dplyr::filter(date == as.Date("2022-03-10")) |> 
+  # dplyr::select(start_d, start_t, stop_t) |>
+  # dplyr::filter(date == as.Date("2022-03-10")) |>
   # dplyr::slice(1:2) |>
   ggplot(aes(x = date)) +
   geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_faint$night       , color = NA) +
@@ -211,7 +208,7 @@ g1 <-
 
 
   geom_line(  aes(y = zenith), color = palette_solid$zenith, linetype = "solid", size = .4) +
-  
+
   geom_rect(
     data = ds_event_within_day
     ,aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t, x = NULL, fill = weekend)
@@ -223,21 +220,21 @@ g1 <-
   geom_text(aes(x=as.Date("2022-03-12")),label = "\U2193 Доба після другого вторгнення \U2193", y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
   geom_text(aes(label = date_display2), y = -Inf, hjust = .5, vjust=-.2,  srt = 0, size = 1.6, na.rm = T, color ="grey40") +
-  
+
   # geom_text(label = "№",x =-Inf, y = -Inf, vjust = -4.5, hjust = -.6, size = 1.6, color = "grey80",lineheight = .8)+
   # geom_text(label = "день",x =-Inf, y = -Inf, vjust = -6, hjust = -1.1, size = 1.5, color = "grey80",lineheight = .8)+
   # geom_text(label = "дата",x =-Inf, y = -Inf, vjust = -1.4, hjust = -1.1, size = 1.5, color = "grey80",lineheight = .8)+
-  
+
   geom_text(aes(x=as.Date("2022-03-11")),label = "\U2191 Кількість повітряних тривог за добу \U2191", y = Inf,vjust = 3.8, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
-  
+
   geom_text(label = " зеніт",        x =as.Date("2022-02-25"), aes(y = hms::parse_hms("12:50:00")), color =palette_solid$zenith, size =3)+
- 
+
   # geom_text(label = "сутінки",      x =as.Date("2022-02-25"), aes(y = hms::parse_hms("20:00:00")), color ="white", size =1.8,srt=2,hjust=.3)+
   geom_text(label = "астрономічнi", x =as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=2,hjust=.35)+
   geom_text(label = "морськi",      x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=3,hjust=1)+
   geom_text(label = "цивільнi сутінки",     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=3,hjust=.2)+
-  
+
   # geom_text(label = "сутінки",      x =as.Date("2022-03-09"), aes(y = hms::parse_hms("20:05:00")), color ="white", size =1.8,srt=2)+
   # geom_text(label = "астрономічнi", x =as.Date("2022-03-10"), aes(y = hms::parse_hms("19:35:00")), color ="white", size =1.8,srt=3)+
   # geom_text(label = "морськi",      x =as.Date("2022-03-11"), aes(y = hms::parse_hms("19:05:00")), color ="white", size =1.8,srt=3)+
@@ -246,8 +243,8 @@ g1 <-
   geom_text(label = "морський",     x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3,hjust=1.15)+
   geom_text(label = "астрономічний",x =as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3,hjust=.6)+
   # geom_text(label = "світанок",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("04:45:00")), color ="white", size =1.8,srt=-3,hjust=.65)+
- 
-  
+
+
   geom_text(label = "Пт",     x =as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
   geom_text(label = "Сб",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
   geom_text(label = "Нд",     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
@@ -290,11 +287,11 @@ g1 <-
     ,axis.text.x = element_blank()
     ,axis.text.y = element_text(color = "grey60",family = "mono")
     # ,plot.margin = margin(20,20,20,20)
-    # ,plot.background = element_rect(fill = "white", color = "black", size = 0) 
+    # ,plot.background = element_rect(fill = "white", color = "black", size = 0)
     # axis.l = element_text(margin=margin(t=20)
     ,panel.grid = element_blank()
     ,axis.ticks.y = element_line(size =.1)
-  ) 
+  )
 g1
 ggsave(
   plot = g1,
@@ -307,23 +304,23 @@ ggsave(
 
 
 # ---- graph-2 -----------------------------------------------------------------
-d2 <- 
-  ds_date_tally %>% 
+d2 <-
+  ds_date_tally %>%
   tidyr::pivot_longer(
     cols = c("event_tally_within_day","duration_total_day","duration_mean_day" )
     ,names_to = "measure"
     ,values_to = "value"
-  ) %>% 
+  ) %>%
   mutate(
     measure = case_when(
       measure == "event_tally_within_day" ~ "count"
       ,measure == "duration_total_day" ~ "total_mins"
       ,measure == "duration_mean_day" ~ "mean_mins"
-      
+
     )
   )
 g2 <-
-  d2 %>% 
+  d2 %>%
   ggplot(aes(x=start_d, y = value))+
   geom_line(size=.4,linetype="dotted")+
   geom_point(shape = 21, size = 3,fill=russian_red, color = "black", alpha = .4)+
@@ -351,5 +348,5 @@ g2 <-
   )
 g2
 g2 %>% quick_save("2-count-duration",width=12, height =4)
-  
+
 
