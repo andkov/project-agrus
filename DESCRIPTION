@@ -1,0 +1,47 @@
+Package: agrus
+Title: Vinnytsia Signals
+Description: Collection of data sets and analyses related to Ukraine in general and Vinnytsia in particulare.
+Version: 0.0.1.9001
+Authors@R: c(person("Will", "Beasley", role = c("aut", "cre"), email =
+                      "wibeasley@hotmail.com", comment = c(ORCID = "0000-0002-5613-5006")),
+             person("Andrey", "Koval", role = "aut"))
+URL: https://github.com/wibeasley/RAnalysisSkeleton
+BugReports: https://github.com/wibeasley/RAnalysisSkeleton/issues
+Depends:
+  R(>= 4.1.0)
+Imports:
+  broom,
+  checkmate  (>= 1.8.4),
+  config,
+  dplyr,
+  explore,
+  ggplot2,
+  googlesheets4,
+  janitor,
+  knitr (>= 1.18.0),
+  methods,
+  OuhscMunge (>= 0.1.9.9009),
+  RColorBrewer,
+  rmarkdown,
+  scales,
+  sessioninfo,
+  tibble,
+  tidyr,
+  yaml
+Suggests:
+  devtools (>= 1.13.0),
+  kableExtra,
+  magrittr,
+  plotly,
+  purrr,
+  readr (>= 1.2.1),
+  remotes,
+  rlang,
+  testit,
+  testthat (>= 0.9)
+Remotes:
+  github::OuhscBbmc/OuhscMunge
+License: MIT + file LICENSE
+VignetteBuilder: knitr
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
