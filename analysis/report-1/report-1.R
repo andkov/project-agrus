@@ -341,22 +341,15 @@ g2 <-
   )+
   labs(
     title = "Статистика повітряних тривог у місті Вінниця"
-    ,subtitle = "Зведення за кожну добу (0-24)"
-    ,caption = "1)Понеділки позначені датами 2) Тривога зараховується до доби у яку почалась\n  Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych "
+    ,subtitle = "Зведення за кожну добу (0-24) -- Тривога зараховується до доби у яку почалась -- Понеділки позначені датами"
+    ,caption = "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                              "
     ,x = NULL
     ,y = "Значення"
+  )+
+  theme(
+    plot.caption = element_text(size=10, color = "grey70")
   )
 g2
 g2 %>% quick_save("2-count-duration",width=12, height =4)
   
-# ---- save-to-disk ------------------------------------------------------------
-path <- "./analysis/.../report-isolated.Rmd"
-rmarkdown::render(
-  input = path ,
-  output_format=c(
-    "html_document"
-    # "word_document"
-    # "pdf_document"
-  ),
-  clean=TRUE
-)
+
