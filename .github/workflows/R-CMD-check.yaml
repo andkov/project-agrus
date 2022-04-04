@@ -30,3 +30,8 @@ jobs:
           extra-packages: rcmdcheck
 
       - uses: r-lib/actions/check-r-package@v1
+      
+      - name: Run Flow
+        run: |
+          source("flow.R")
+        shell: Rscript {0} 
