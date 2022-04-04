@@ -64,64 +64,29 @@ founded <-
   )
 names(founded) <- c("misto","oblast","pop_count","founded", "area_km2")
 
-founded %>% slice(1:5) %>% select(1:4)
-
-founded %>% readr::write_csv("./test.csv")
-
-# library(formattable)
-# 
-# df <- data.frame(test = c("\u2265", "\u2264", "==", "equals", "!=", "\u2265=", "\u2264="))
-# 
-# formattable(df)
-
 # ---- inspect-data ------------------------------------------------------------
 founded %>% glimpse()
-founded
-founded %>% neat()
-founded %>% knitr::kable(format = "latex")
+
 # ---- tweak-data-founded --------------------------------------------------------------
-
-ds0 <- readr::read_csv("data-public/raw/ukraine-cities.csv")
-
 ds0 <- 
-  founded %>%
-  # test %>% 
-  select(1:2) %>% slice(1:4) %>% 
+  founded %>% 
+
   mutate(
     misto = str_remove(misto,"\\[.\\]")
     ,oblast = str_remove(oblast, " область")
-    # ,misto2 = enc2utf8(misto)
-    # ,misto2 = 
-    ,misto = gsub("<U\\+([0-9A-F]{4})>", "&#x\\1;", misto)
-    # ,misto = str_replace(misto, "<U\\+([0-9A-F]{4})>", "&#x\\1;")
-    # ,misto = str_replace(misto, "\\<U\\+0410>", "XXXXXXX;")
-    # ,oblast = gsub( "<U\\+([0-9A-F]{4})>", "&#x\\1;", x = oblast)
-  #   ,count = pop_count %>% str_remove(" ") %>% as.integer()
-  #   ,founded = founded %>% str_remove("\\[.\\]") %>% stringr::str_trim()
-  #   ,centruy_founded = stringr
-  #   ,pop_count = pop_count %>% str_remove(" ") %>% as.integer()
+    ,count = pop_count %>% str_remove(" ") %>% as.integer()
+    ,founded = founded %>% str_remove("\\[.\\]") %>% stringr::str_trim()
+    ,year_founded = case_when(
+      founded == "X ст." ~ 950
+      
+    )
   )
-ds0 %>% glimpse()
-ds0 #%>% select(1:2) %>% slice(1:3)
+ds0 %>% select(1:4) %>% slice(1:5)
 ds0 %>% neat()
-
-(a_string <- founded[1,1] %>% as.vector())
-a_string %>% str_replace("\\<U\\+0410>","&#x\\1;")
-
-
-d <- 
-  ds0 %>% select(1:2) %>% slice(1:4)
-d
 
 ds0 %>% 
   group_by(oblast) %>% 
   count()
-
-
-d <- 
-  founded %>% 
-  filter(founded = matches)
-
 
 
 ds0 %>% readr::write_csv("./data-unshared/derived/ds0.csv")

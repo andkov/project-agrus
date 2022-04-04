@@ -27,11 +27,9 @@ library(explore)   # for `describe_all()`
 library(scales)    # formatting
 library(labelled)  # labels - https://cran.r-project.org/web/packages/labelled/vignettes/intro_labelled.html
 library(rlang)     # tidy evaluations -  https://www.tidyverse.org/blog/2019/06/rlang-0-4-0/   
+library(readr)
 
-
-# 
 # ---- declare-globals ---------------------------------------------------------
-
 # path_files should be the last element of the chunk
 # ---- declare-functions -------------------------------------------------------
 # store script-specific function here
@@ -41,91 +39,73 @@ library(googlesheets4)
 googlesheets4::gs4_deauth() # to indicate there is no need for a access token
 # By default we will work with public Sheets
 # but see https://googlesheets4.tidyverse.org/ for how to set access to private
-# URL https://docs.google.com/spreadsheets/d/1Ha5JmJRzV1e2ljN3lNLu-pZJwyehJPoKrw9CtMvBMks/edit?usp=sharing
-sheet_name <- "1Ha5JmJRzV1e2ljN3lNLu-pZJwyehJPoKrw9CtMvBMks"
-tab_name1 <- "За алфавітом"
-tab_name2 <- "За населенням"
-tab_name3 <- "За українцями"
+# URL https://docs.google.com/spreadsheets/d/1_YLy7BEP3fSUGlZeVxtybfFRIxVNswXUa0oEOVrOIJ8/edit#gid=200032068
+sheet_name <- "1_YLy7BEP3fSUGlZeVxtybfFRIxVNswXUa0oEOVrOIJ8"
+tab_name1 <- "source"
 
-population <- read_sheet(sheet_name,tab_name2,skip = 1)
-ukrainians <- read_sheet(sheet_name,tab_name3,skip = 1)
-
-
-founded <- 
-  sheet_name %>% 
-  read_sheet( 
-    skip = 1
-    ,sheet = tab_name1
+c("%m/%d/%Y", rep("%H:%M",17))
+ds0 <- 
+  read_sheet(
+    sheet_name
+    ,tab_name1
+    ,skip = 1
     ,col_names = TRUE
-  ) %>% 
-  select(-1) %>% 
-  mutate(
-    across(names(.),as.character)
-  )
-names(founded) <- c("misto","oblast","pop_count","founded", "area_km2")
-
-founded %>% slice(1:5) %>% select(1:4)
-
-founded %>% readr::write_csv("./test.csv")
-
-# library(formattable)
-# 
-# df <- data.frame(test = c("\u2265", "\u2264", "==", "equals", "!=", "\u2265=", "\u2264="))
-# 
-# formattable(df)
+    # ,col_types =c("%m/%d/%Y", rep("%H:%M",17))
+   ) %>% 
+  select(1,seq(2,16,2)) #%>% slice(1:7)
+ds0 %>% glimpse()
+hours <- c("00_03",	"03_06",	"06_09",	"09_12",	"12_15"	,"15_18",	"18_21",	"21_24")
 
 # ---- inspect-data ------------------------------------------------------------
-founded %>% glimpse()
-founded
-founded %>% neat()
-founded %>% knitr::kable(format = "latex")
-# ---- tweak-data-founded --------------------------------------------------------------
 
-ds0 <- readr::read_csv("data-public/raw/ukraine-cities.csv")
 
-ds0 <- 
-  founded %>%
-  # test %>% 
-  select(1:2) %>% slice(1:4) %>% 
+# ---- tweak-data --------------------------------------------------------------
+ds1 <- 
+  ds0 %>% 
+  tidyr::fill(date) %>% 
+  # filter(date %in% as.Date(c("2022-02-27","2022-02-28"))) %>% 
+  # group_by(date) %>% 
+  tidyr::pivot_longer(2:9,names_to = "hour", values_to = "time") %>% 
+  arrange(date, hour, time) %>% 
+  filter(!is.na(time)) %>% 
   mutate(
-    misto = str_remove(misto,"\\[.\\]")
-    ,oblast = str_remove(oblast, " область")
-    # ,misto2 = enc2utf8(misto)
-    # ,misto2 = 
-    ,misto = gsub("<U\\+([0-9A-F]{4})>", "&#x\\1;", misto)
-    # ,misto = str_replace(misto, "<U\\+([0-9A-F]{4})>", "&#x\\1;")
-    # ,misto = str_replace(misto, "\\<U\\+0410>", "XXXXXXX;")
-    # ,oblast = gsub( "<U\\+([0-9A-F]{4})>", "&#x\\1;", x = oblast)
-  #   ,count = pop_count %>% str_remove(" ") %>% as.integer()
-  #   ,founded = founded %>% str_remove("\\[.\\]") %>% stringr::str_trim()
-  #   ,centruy_founded = stringr
-  #   ,pop_count = pop_count %>% str_remove(" ") %>% as.integer()
+    time = hms::as_hms(time)#+hms::as_hms("07:00:00")
   )
-ds0 %>% glimpse()
-ds0 #%>% select(1:2) %>% slice(1:3)
-ds0 %>% neat()
-
-(a_string <- founded[1,1] %>% as.vector())
-a_string %>% str_replace("\\<U\\+0410>","&#x\\1;")
+ds1
 
 
-d <- 
-  ds0 %>% select(1:2) %>% slice(1:4)
-d
+ds2 <-
+  ds1 %>% 
+  mutate(
+    signal = (!(row_number() %% 2 == 0L))
+    ,date_time = lubridate::ymd_hms(paste0(date," ",time))
+  ) %>% 
+  select(date_time,signal) %>% 
+  # group_by(date) %>% 
+  mutate(
+    event_n = cumsum(signal)
+  ) %>% 
+  mutate(
+    signal = case_when(
+      signal == TRUE ~ "signal_on"
+      ,signal == FALSE ~ "signal_off"
+      ,TRUE ~ NA_character_
+    )
+    # ,date_time = as.character(date_time)
+    # ,date_time2 = strftime(date_time,format = "%Y-%m-%d %H:%M")
+  ) %>% 
+  tidyr::pivot_wider(names_from = "signal", values_from = "date_time") 
+ds2
 
-ds0 %>% 
-  group_by(oblast) %>% 
-  count()
+ds2 %>%
+  arrange(desc(event_n)) %>% 
+  readr::write_csv(file = "./data-public/raw/data-input.csv")
+
+ds3 <- 
+  readr::read_csv("./data-public/raw/data-input.csv")
+ds3 %>% glimpse()
 
 
-d <- 
-  founded %>% 
-  filter(founded = matches)
-
-
-
-ds0 %>% readr::write_csv("./data-unshared/derived/ds0.csv")
-ds1 <- readr::write_csv("./data-unshared/derived/ds0.csv")
 # ---- table-1 -----------------------------------------------------------------
 
 

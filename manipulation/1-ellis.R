@@ -33,14 +33,67 @@ library(rlang)     # tidy evaluations -  https://www.tidyverse.org/blog/2019/06/
 # path_files should be the last element of the chunk
 # ---- declare-functions -------------------------------------------------------
 # store script-specific function here
+# OuhscMunge::readr_spec_aligned("data-public/raw/data-input.csv")
+col_types <- readr::cols_only(
+  `event_n`       = readr::col_integer(),
+  `signal_on`     = readr::col_datetime(format = ""),
+  `signal_off`    = readr::col_datetime(format = "")
+)
 
 # ---- load-data ---------------------------------------------------------------
-ds0 <- readr::read_csv("./data-public/raw/data-input.csv",col_select = 2:3)
+ds_event <- readr::read_csv("data-public/raw/data-input.csv", col_types = col_types)
+# ds0 <- readr::read_csv("./data-public/raw/data-input.csv",col_select = 2:3)
 
 # ---- inspect-data ------------------------------------------------------------
-ds0 %>% glimpse()
+ds_event %>% glimpse()
 
 # ---- tweak-data --------------------------------------------------------------
+ds1 <- 
+  ds_event %>% 
+  mutate(
+    event_n = row_number()
+    ,duration = as.duration(signal_off - signal_on)
+  ) %>% 
+  tidyr::pivot_longer(
+    cols = c("signal_on","signal_off")
+    ,names_to = "signal_goes"
+    ,values_to = "date_time"
+  ) %>% 
+  mutate(
+    signal_goes = signal_goes %>% str_remove("^signal_")
+    ,date = strftime(date_time,"%Y-%m-%d") %>% date()
+    ,time = strftime(date_time,"%H:%M:%S") %>% hms::as_hms()
+  )
+ds1
+
+# ---- alt-data -----------------------------------------------------------------
+ds0 <- 
+  read_csv(
+  "data-unshared/raw/air-siren-vinnytsia-2022-03-23-2.csv"
+  ,col_types = cols(
+    signal_goes = col_factor(levels = c("on", "off"))
+    ,time  = col_time(format = "%H:%M")
+    ,date  = col_date(format = "%m/%d/%Y")
+  )
+  ) %>% 
+  tidyr::fill(date) %>% 
+  mutate(
+    date_time = lubridate::ymd_hms(paste0(date," ",time))
+  ) %>% 
+  # arrange(date,time) %>%
+  select(-time,-date) %>%
+  mutate(
+    event_n = (!(row_number() %% 2 == 0L)) %>% cumsum()
+  ) %>% 
+  tidyr::pivot_wider(
+    id_cols = "event_n"
+    ,names_from="signal_goes"
+    ,values_from = "date_time"
+    ,names_prefix = "signal_"
+  )
+ds0 %>% glimpse()
+ds0 %>% slice(15:22)
+
 ds1 <- 
   ds0 %>% 
   mutate(
@@ -58,8 +111,6 @@ ds1 <-
     ,time = strftime(date_time,"%H:%M:%S") %>% hms::as_hms()
   )
 ds1
-# ---- table-1 -----------------------------------------------------------------
-
 
 # ---- graph-1 -----------------------------------------------------------------
 
