@@ -35,3 +35,11 @@ jobs:
         run: |
           source("flow.R")
         shell: Rscript {0} 
+
+      - name: Commit files
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add --all
+          git commit -am "update graphics and/or report #6"
+          git push 
