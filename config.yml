@@ -27,7 +27,33 @@ default:
   month_02:   "Лютий 2022"
   month_03:   " Березень"
   month_04:   " Квітень"
+  day_of_invasion: "Доба після другого вторгнення"
+  number_symbol: "№"
+  day_ua: "день"
+  date_ua: "дата"
+  sirens_per_day: "Кількість повітряних тривог за добу"
+  zenith_ua: " зеніт"
+  dusk_astro_ua: "астрономічнi"    
+  dusk_nautical_ua: "морськi"         
+  dusk_civil_ua:  "цивільнi сутінки"
+  
+  dawn_civil_ua:  "цивільний світанок"
+  dawn_nautical_ua: "морський"         
+  dawn_astro_ua: "астрономічний"     
+  
+  monday_ua: "Пт"
+  tuesday_ua: "Сб"
+  wednesday_ua: "Нд"
+  thursday_ua: "Пн"
+  friday_ua: "Вт"
+  saturday_ua: "Ср"
+  sunday_ua: "Чт"
 
+  title_ua: "Тривалисть та частота повітряних тривог у м.Вінниця"
+  subtitle_ua: "м.Вінниця, перший місяць війни 2022 року"
+  caption_ua: "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
+  y_lable _ua: "Година доби"
+  
   # time_zone_local               :  "America/Chicago"          # Force time calculations to be local, in case remotely run.
 
   # ---- Validation Ranges & Patterns ----
