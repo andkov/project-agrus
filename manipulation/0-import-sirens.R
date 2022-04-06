@@ -16,18 +16,18 @@ source("./scripts/common-functions.R")# functions sourced throughout the project
 # core packages - turn ON/OFF to help overview the scope of the script
 library(magrittr)  # pipes
 library(dplyr)     # data wrangling
-library(ggplot2)   # graphs
-library(janitor)   # tidy data
-library(tidyr)     # data wrangling
-library(forcats)   # factors
-library(stringr)   # strings
-library(lubridate) # dates
-library(readxl)    # data import
-library(explore)   # for `describe_all()` 
-library(scales)    # formatting
-library(labelled)  # labels - https://cran.r-project.org/web/packages/labelled/vignettes/intro_labelled.html
-library(rlang)     # tidy evaluations -  https://www.tidyverse.org/blog/2019/06/rlang-0-4-0/   
-library(readr)
+# library(ggplot2)   # graphs
+# library(janitor)   # tidy data
+# library(tidyr)     # data wrangling
+# library(forcats)   # factors
+# library(stringr)   # strings
+# library(lubridate) # dates
+# library(readxl)    # data import
+# library(explore)   # for `describe_all()` 
+# library(scales)    # formatting
+# library(labelled)  # labels - https://cran.r-project.org/web/packages/labelled/vignettes/intro_labelled.html
+# library(rlang)     # tidy evaluations -  https://www.tidyverse.org/blog/2019/06/rlang-0-4-0/   
+# library(readr)
 
 # ---- declare-globals ---------------------------------------------------------
 # path_files should be the last element of the chunk

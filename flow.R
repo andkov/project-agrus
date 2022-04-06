@@ -4,8 +4,6 @@ rm(list = ls(all.names = TRUE)) # Clear the memory of variables from previous ru
 # ---- load-sources ------------------------------------------------------------
 
 # ---- load-packages -----------------------------------------------------------
-import::from("magrittr", "%>%")
-
 requireNamespace("purrr")
 requireNamespace("rlang")
 # requireNamespace("checkmate")
@@ -19,27 +17,27 @@ options(knitr.duplicate.label = "allow")
 
 config        <- config::get()
 
-# open log
-if( interactive() ) {
-  sink_log <- FALSE
-} else {
-  message("Creating flow log file at ", config$path_log_flow)
+# # open log
+# if( interactive() ) {
+#   sink_log <- FALSE
+# } else {
+#   message("Creating flow log file at ", config$path_log_flow)
   
-  if( !dir.exists(dirname(config$path_log_flow)) ) {
-    # Create a month-specific directory, so they're easier to find & compress later.
-    dir.create(dirname(config$path_log_flow), recursive=T)
-  }
+#   if( !dir.exists(dirname(config$path_log_flow)) ) {
+#     # Create a month-specific directory, so they're easier to find & compress later.
+#     dir.create(dirname(config$path_log_flow), recursive=T)
+#   }
   
-  file_log  <- file(
-    description   = config$path_log_flow,
-    open          = "wt"
-  )
-  sink(
-    file    = file_log,
-    type    = "message"
-  )
-  sink_log <- TRUE
-}
+#   file_log  <- file(
+#     description   = config$path_log_flow,
+#     open          = "wt"
+#   )
+#   sink(
+#     file    = file_log,
+#     type    = "message"
+#   )
+#   sink_log <- TRUE
+# }
 
 # Typically, only `ds_rail` changes.  Everything else in this file is constant between projects.
 ds_rail  <- tibble::tribble(
@@ -140,11 +138,11 @@ message("Completed flow of `", basename(base::getwd()), "` at ", Sys.time(), "")
 elapsed_duration
 options(warn=warn_level_initial)  # Restore the whatever warning level you started with.
 
-# ---- close-log ---------------------------------------------------------------
-# close(file_log)
-if( sink_log ) {
-  sink(file = NULL, type = "message") # ends the last diversion (of the specified type).
-  message("Closing flow log file at ", gsub("/", "\\\\", config$path_log_flow))
-}
+# # ---- close-log ---------------------------------------------------------------
+# # close(file_log)
+# if( sink_log ) {
+#   sink(file = NULL, type = "message") # ends the last diversion (of the specified type).
+#   message("Closing flow log file at ", gsub("/", "\\\\", config$path_log_flow))
+# }
 
 # bash: Rscript flow.R

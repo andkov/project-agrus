@@ -11,11 +11,11 @@ cat("Working directory: ", getwd()) # Must be set to Project Directory
 library(magrittr)  # pipes
 library(dplyr)     # data wrangling
 library(ggplot2)   # graphs
-library(janitor)   # tidy data
-library(tidyr)     # data wrangling
-library(forcats)   # factors
-library(stringr)   # strings
-library(lubridate) # dates
+# library(janitor)   # tidy data
+# library(tidyr)     # data wrangling
+# library(forcats)   # factors
+# library(stringr)   # strings
+# library(lubridate) # dates
 
 # ---- load-sources ------------------------------------------------------------
 source("./scripts/common-functions.R")
