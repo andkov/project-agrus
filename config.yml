@@ -52,7 +52,7 @@ default:
   title_ua: "Тривалисть та частота повітряних тривог у м.Вінниця"
   subtitle_ua: "м.Вінниця, перший місяць війни 2022 року"
   caption_ua: "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
-  y_lable _ua: "Година доби"
+  y_label_ua: "Година доби"
   
   # time_zone_local               :  "America/Chicago"          # Force time calculations to be local, in case remotely run.
 
