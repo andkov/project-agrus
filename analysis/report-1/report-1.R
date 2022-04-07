@@ -21,8 +21,8 @@ library(ggplot2)   # graphs
 source("./scripts/common-functions.R")
 # ---- declare-globals ---------------------------------------------------------
 # config                         <- config::get()
-# config                         <- config::get(config = "language_ua")
-config                         <- config::get(config = "language_en")
+config                         <- config::get(config = "language_ua")
+# config                         <- config::get(config = "language_en")
 
 # ---- declare-functions -------------------------------------------------------
 # custom function for HTML tables
@@ -92,9 +92,6 @@ ds_date <-
       date == as.Date("2022-04-02") ~ config$month_04,
       TRUE ~ " "
     ),
-    # date_display     = sprintf("%2i/%2i", date_index, date_index_rev),
-    # date_display     = sprintf("%2i\n%2i", date_index, date_index_rev),
-    # date_display     = sprintf("%2s\n%2s\n%s", as.character(date_index), as.character(date_of_month),month_name),
     date_display     = sprintf("%2i", date_index+1),
     date_display     =
       dplyr::case_when(
@@ -110,8 +107,6 @@ ds_date <-
         date_index_rev  == 0  ~ NA_character_,
         TRUE                  ~ date_display2
       )
-
-
   ) |>
   dplyr::mutate(
     event_tally_within_day = dplyr::if_else(1L <= date_index & 1L <= date_index_rev, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
@@ -191,12 +186,6 @@ palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
 
 g1 <-
   ds_date |>
-  # mutate(
-  #   zenith2 = hms::as_hms("12:2")
-  # )
-  # dplyr::select(start_d, start_t, stop_t) |>
-  # dplyr::filter(date == as.Date("2022-03-10")) |>
-  # dplyr::slice(1:2) |>
   ggplot(aes(x = date)) +
   geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_faint$night       , color = NA) +
   geom_ribbon(aes(ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_faint$astronomical, color = NA) +
@@ -207,7 +196,6 @@ g1 <-
   geom_ribbon(aes(ymin = stop_civil             , ymax = stop_nautical          ), fill = palette_faint$nautical    , color = NA) +
   geom_ribbon(aes(ymin = stop_nautical          , ymax = stop_astronomical      ), fill = palette_faint$astronomical, color = NA) +
   geom_ribbon(aes(ymin = stop_astronomical      , ymax = hms::as_hms("24:00:00")), fill = palette_faint$night      , color = NA) +
-
 
   geom_line(  aes(y = zenith), color = palette_solid$zenith, linetype = "solid", size = .4) +
 
@@ -224,59 +212,51 @@ g1 <-
   geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
   geom_text(aes(label = date_display2), y = -Inf, hjust = .5, vjust=-.2,  srt = 0, size = 1.6, na.rm = T, color ="grey40") +
 
-
   geom_text(aes(x=as.Date("2022-03-11")),label = config$sirens_per_day, y = Inf,vjust = 3.8, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
 
   geom_text(label = config$zenith,        x =as.Date("2022-03-03"), aes(y = hms::parse_hms("12:50:00")), color =palette_solid$zenith, size =3)+
 
-# geom_text(label = "сутінки",      x =as.Date("2022-02-25"), aes(y = hms::parse_hms("20:00:00")), color ="white", size =1.8,srt=2,hjust=.3)+
-geom_text(label = config$dusk_astro, x =as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=2,hjust=.35)+
-geom_text(label = config$dusk_nautical,      x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=3,hjust=1)+
-geom_text(label = config$dusk_civil,     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=3,hjust=.2)+
-
-# geom_text(label = "сутінки",      x =as.Date("2022-03-09"), aes(y = hms::parse_hms("20:05:00")), color ="white", size =1.8,srt=2)+
-# geom_text(label = "астрономічнi", x =as.Date("2022-03-10"), aes(y = hms::parse_hms("19:35:00")), color ="white", size =1.8,srt=3)+
-# geom_text(label = "морськi",      x =as.Date("2022-03-11"), aes(y = hms::parse_hms("19:05:00")), color ="white", size =1.8,srt=3)+
-# geom_text(label = "цивільнi",     x =as.Date("2022-03-11"), aes(y = hms::parse_hms("18:35:00")), color ="white", size =1.8,srt=3)+
-geom_text(label = config$dawn_civil,    x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3,hjust=.5)+
-geom_text(label = config$dawn_nautical,         x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3,hjust=1.15)+
-geom_text(label = config$dawn_astro ,x =as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3,hjust=.6)+
-# geom_text(label = "світанок",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("04:45:00")), color ="white", size =1.8,srt=-3,hjust=.65)+
+  geom_text(label = config$dusk_astro   , x = as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=+2, hjust= .35)+
+  geom_text(label = config$dusk_nautical, x = as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=+3, hjust=1   )+
+  geom_text(label = config$dusk_civil   , x = as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=+3, hjust= .2 )+
+  geom_text(label = config$dawn_civil   , x = as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3, hjust= .5 )+
+  geom_text(label = config$dawn_nautical, x = as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3, hjust=1.15)+
+  geom_text(label = config$dawn_astro   , x = as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3, hjust= .6 )+
 
 
-geom_text(label = config$monday,     x =as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-geom_text(label = config$tuesday,     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
-geom_text(label = config$wednesday,     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
-geom_text(label = config$thursday,     x =as.Date("2022-02-28"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-geom_text(label = config$friday,     x =as.Date("2022-03-01"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-geom_text(label = config$saturday,     x =as.Date("2022-03-02"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-geom_text(label = config$sunday,     x =as.Date("2022-03-03"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-#https://uk.wikipedia.org/wiki/%D0%A1%D0%B2%D1%96%D1%82%D0%B0%D0%BD%D0%BE%D0%BA
-scale_x_date(
-  date_labels = "%b\n%d", date_breaks = "1 week", date_minor_breaks = "1 week"
-  # ,limits = as.Date(c("2022-02-25","2022-03-25"))
-  ,expand = expansion(mult=c(0,.05))
+  geom_text(label = config$monday   , x=as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = config$tuesday  , x=as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
+  geom_text(label = config$wednesday, x=as.Date("2022-02-27"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
+  geom_text(label = config$thursday , x=as.Date("2022-02-28"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = config$friday   , x=as.Date("2022-03-01"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = config$saturday , x=as.Date("2022-03-02"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = config$sunday   , x=as.Date("2022-03-03"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  #https://uk.wikipedia.org/wiki/%D0%A1%D0%B2%D1%96%D1%82%D0%B0%D0%BD%D0%BE%D0%BA
+  scale_x_date(
+    date_labels = "%b\n%d", date_breaks = "1 week", date_minor_breaks = "1 week"
+    # ,limits = as.Date(c("2022-02-25","2022-03-25"))
+    ,expand = expansion(mult=c(0,.05))
+    ) +
+  scale_y_time(
+    breaks = hms::as_hms(c("00:00:00", "04:00:00", "08:00:00", "12:00:00", "16:00:00", "20:00:00", "24:00:00")),
+    # minor_breaks = hms::as_hms(c("01:00:00", "02:00:00", "03:00:00", "05:00:00", "06:00:00", "07:00:00", "09:00:00")),
+    labels = c("00", "04", "08", "12", "16", "20", "24")
+    ,expand = expansion(mult=c(.06,.045))
+    # ,sec.axis = sec_axis(name="Secondary")
   ) +
-scale_y_time(
-  breaks = hms::as_hms(c("00:00:00", "04:00:00", "08:00:00", "12:00:00", "16:00:00", "20:00:00", "24:00:00")),
-  # minor_breaks = hms::as_hms(c("01:00:00", "02:00:00", "03:00:00", "05:00:00", "06:00:00", "07:00:00", "09:00:00")),
-  labels = c("00", "04", "08", "12", "16", "20", "24")
-  ,expand = expansion(mult=c(.06,.045))
-  # ,sec.axis = sec_axis(name="Secondary")
-) +
-scale_fill_manual(values = c("TRUE"=palette_faint$signal2, "FALSE"=palette_faint$signal))+
-scale_color_brewer(type = "seq", palette = "YlOrRd") +
-# # scale_color_continuous(type = "viridis") +
-scale_colour_viridis_b(direction = -1) +
-coord_cartesian(ylim = hms::parse_hms(c("00:00:00", "23:59:59"))) +
-theme_minimal() +
-labs(
-  title = config$title
-  ,caption = config$caption
-  ,x = NULL
-  ,y = config$y_label
-)+
+  scale_fill_manual(values = c("TRUE"=palette_faint$signal2, "FALSE"=palette_faint$signal))+
+  scale_color_brewer(type = "seq", palette = "YlOrRd") +
+  # # scale_color_continuous(type = "viridis") +
+  scale_colour_viridis_b(direction = -1) +
+  coord_cartesian(ylim = hms::parse_hms(c("00:00:00", "23:59:59"))) +
+  theme_minimal() +
+  labs(
+    title = config$title
+    ,caption = config$caption
+    ,x = NULL
+    ,y = config$y_label
+  ) +
   theme(
     legend.position = "none"
     ,plot.title = element_text(size=10)
