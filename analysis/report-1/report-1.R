@@ -20,7 +20,8 @@ library(ggplot2)   # graphs
 # ---- load-sources ------------------------------------------------------------
 source("./scripts/common-functions.R")
 # ---- declare-globals ---------------------------------------------------------
-config                         <- config::get()
+# config                         <- config::get()
+config                         <- config::get(config = "language_ua")
 
 # ---- declare-functions -------------------------------------------------------
 # custom function for HTML tables
@@ -44,37 +45,37 @@ ds_date_sunrise <- readr::read_rds(config$path_derived_sunrise_rds)
 # ds |> dplyr::glimpse()
 
 # ---- tweak-data --------------------------------------------------------------
-ds_event <- 
-  ds_event |> 
+ds_event <-
+  ds_event |>
   dplyr::select(    # `dplyr::select()` drops columns not included.
     event_id           = `event_n`,
     start_dt           = `signal_on`,
     stop_dt            = `signal_off`,
-  ) |> 
+  ) |>
   dplyr::mutate(
     duration_minutes = as.integer(difftime(stop_dt, start_dt, units = "mins")),
     start_d          = as.Date(start_dt),
     stop_d           = as.Date(stop_dt),
     start_t          = hms::as_hms(start_dt),
     stop_t           = hms::as_hms(stop_dt),
-  ) 
+  )
 
-date_range <- range(ds_event$start_d, ds_event$stop_d) 
+date_range <- range(ds_event$start_d, ds_event$stop_d)
 
 ds_date_sunrise <-
-  ds_date_sunrise |> 
+  ds_date_sunrise |>
   dplyr::filter(dplyr::between(date, date_range[1] - 1L, date_range[2] + 1L))
 
 ds_date_tally <-
-  ds_event |> 
-  # ds_date_sunrise |> 
-  # # dplyr::left_join(ds_event, by = c("date" = "start_d")) |> 
-  dplyr::group_by(start_d) |> 
+  ds_event |>
+  # ds_date_sunrise |>
+  # # dplyr::left_join(ds_event, by = c("date" = "start_d")) |>
+  dplyr::group_by(start_d) |>
   dplyr::summarize(
     event_tally_within_day = dplyr::n()
     ,duration_total_day = sum(duration_minutes)
     ,duration_mean_day = mean(duration_minutes)
-  )|> 
+  )|>
   dplyr::ungroup()
 
 ds_date <-
@@ -221,35 +222,35 @@ g1 <-
   geom_text(aes(x=as.Date("2022-03-12")),label = config$day_of_invasion, y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
   geom_text(aes(label = date_display2), y = -Inf, hjust = .5, vjust=-.2,  srt = 0, size = 1.6, na.rm = T, color ="grey40") +
-  
+
 
   geom_text(aes(x=as.Date("2022-03-11")),label = config$sirens_per_day, y = Inf,vjust = 3.8, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
 
-  geom_text(label = config$zenith_ua,        x =as.Date("2022-03-03"), aes(y = hms::parse_hms("12:50:00")), color =palette_solid$zenith, size =3)+
+  geom_text(label = config$zenith,        x =as.Date("2022-03-03"), aes(y = hms::parse_hms("12:50:00")), color =palette_solid$zenith, size =3)+
 
 # geom_text(label = "сутінки",      x =as.Date("2022-02-25"), aes(y = hms::parse_hms("20:00:00")), color ="white", size =1.8,srt=2,hjust=.3)+
-geom_text(label = config$dusk_astro_ua, x =as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=2,hjust=.35)+
-geom_text(label = config$dusk_nautical_ua,      x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=3,hjust=1)+
-geom_text(label = config$dusk_civil_ua,     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=3,hjust=.2)+
+geom_text(label = config$dusk_astro, x =as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=2,hjust=.35)+
+geom_text(label = config$dusk_nautical,      x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=3,hjust=1)+
+geom_text(label = config$dusk_civil,     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=3,hjust=.2)+
 
 # geom_text(label = "сутінки",      x =as.Date("2022-03-09"), aes(y = hms::parse_hms("20:05:00")), color ="white", size =1.8,srt=2)+
 # geom_text(label = "астрономічнi", x =as.Date("2022-03-10"), aes(y = hms::parse_hms("19:35:00")), color ="white", size =1.8,srt=3)+
 # geom_text(label = "морськi",      x =as.Date("2022-03-11"), aes(y = hms::parse_hms("19:05:00")), color ="white", size =1.8,srt=3)+
 # geom_text(label = "цивільнi",     x =as.Date("2022-03-11"), aes(y = hms::parse_hms("18:35:00")), color ="white", size =1.8,srt=3)+
-geom_text(label = config$dawn_civil_ua,    x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3,hjust=.5)+
-geom_text(label = config$dawn_nautical_ua,         x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3,hjust=1.15)+
-geom_text(label = config$dawn_astro_ua ,x =as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3,hjust=.6)+
+geom_text(label = config$dawn_civil,    x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3,hjust=.5)+
+geom_text(label = config$dawn_nautical,         x =as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3,hjust=1.15)+
+geom_text(label = config$dawn_astro ,x =as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3,hjust=.6)+
 # geom_text(label = "світанок",     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("04:45:00")), color ="white", size =1.8,srt=-3,hjust=.65)+
 
 
-geom_text(label = config$monday_ua,     x =as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-geom_text(label = config$tuesday_ua,     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
-geom_text(label = config$wednesday_ua,     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
-geom_text(label = config$thursday_ua,     x =as.Date("2022-02-28"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-geom_text(label = config$friday_ua,     x =as.Date("2022-03-01"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-geom_text(label = config$saturday_ua,     x =as.Date("2022-03-02"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-geom_text(label = config$sunday_ua,     x =as.Date("2022-03-03"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+geom_text(label = config$monday,     x =as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+geom_text(label = config$tuesday,     x =as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
+geom_text(label = config$wednesday,     x =as.Date("2022-02-27"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
+geom_text(label = config$thursday,     x =as.Date("2022-02-28"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+geom_text(label = config$friday,     x =as.Date("2022-03-01"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+geom_text(label = config$saturday,     x =as.Date("2022-03-02"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+geom_text(label = config$sunday,     x =as.Date("2022-03-03"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
 #https://uk.wikipedia.org/wiki/%D0%A1%D0%B2%D1%96%D1%82%D0%B0%D0%BD%D0%BE%D0%BA
 scale_x_date(
   date_labels = "%b\n%d", date_breaks = "1 week", date_minor_breaks = "1 week"
@@ -270,10 +271,10 @@ scale_colour_viridis_b(direction = -1) +
 coord_cartesian(ylim = hms::parse_hms(c("00:00:00", "23:59:59"))) +
 theme_minimal() +
 labs(
-  title = config$title_ua
-  ,caption = config$caption_ua
+  title = config$title
+  ,caption = config$caption
   ,x = NULL
-  ,y = config$y_label_ua
+  ,y = config$y_label
 )+
   theme(
     legend.position = "none"
@@ -297,5 +298,4 @@ ggsave(
   width    = 5,
   dpi      = 400,
   bg       = "white"
-) 
-
+)
