@@ -217,12 +217,19 @@ g1 <-
 
   geom_text(label = config$zenith,        x =as.Date("2022-03-03"), aes(y = hms::parse_hms("12:50:00")), color =palette_solid$zenith, size =3)+
 
-  geom_text(label = config$dusk_astro   , x = as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=+2, hjust= .35)+
-  geom_text(label = config$dusk_nautical, x = as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=+3, hjust=1   )+
-  geom_text(label = config$dusk_civil   , x = as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=+3, hjust= .2 )+
-  geom_text(label = config$dawn_civil   , x = as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3, hjust= .5 )+
-  geom_text(label = config$dawn_nautical, x = as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3, hjust=1.15)+
-  geom_text(label = config$dawn_astro   , x = as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3, hjust= .6 )+
+  annotate("text", label = config$dusk_astro   , x = min(ds_date$date) + 1, y=ds_date$stop_astronomical[1]  , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
+  annotate("text", label = config$dusk_nautical, x = min(ds_date$date) + 1, y=ds_date$stop_nautical[1]      , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
+  annotate("text", label = config$dusk_civil   , x = min(ds_date$date) + 1, y=ds_date$stop_civil[1]         , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
+  annotate("text", label = config$dawn_civil   , x = min(ds_date$date) + 1, y=ds_date$start_civil[1]        , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
+  annotate("text", label = config$dawn_nautical, x = min(ds_date$date) + 1, y=ds_date$start_nautical[1]     , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
+  annotate("text", label = config$dawn_astro   , x = min(ds_date$date) + 1, y=ds_date$start_astronomical[1] , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
+
+  # geom_text(label = config$dusk_astro   , x = as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=+3, hjust= .35)+
+  # geom_text(label = config$dusk_nautical, x = as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=+3, hjust=1   )+
+  # geom_text(label = config$dusk_civil   , x = as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=+3, hjust= .2 )+
+  # geom_text(label = config$dawn_civil   , x = as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3, hjust= .5 )+
+  # geom_text(label = config$dawn_nautical, x = as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3, hjust=1.15)+
+  # geom_text(label = config$dawn_astro   , x = as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3, hjust= .6 )+
 
 
   geom_text(label = config$monday   , x=as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
