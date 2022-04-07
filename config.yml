@@ -1,5 +1,4 @@
 default:
-
   # directory_file_server       : "//fileshare/agrus"
   # directory_output            : !expr strftime(Sys.time(), "//fileshare/agrus/data-private/derived/%Y-%m-%d")
   # path_log_flow               : !expr strftime(Sys.time(), "data-unshared/log/%Y/%Y-%m/flow-%Y-%m-%d--%H-%M-%S.log")
@@ -8,7 +7,7 @@ default:
   path_derived_sunrise_csv      : "data-public/derived/date-sunrise-2022.csv"
   path_derived_sunrise_rds      : "data-public/derived/date-sunrise-2022.rds"
   # path_metadata_ss_dx         : "data-public/metadata/ss-dx.csv"
-  # time_zone_local             : "America/Chicago"          # Force time calculations to be local, in case remotely run.
+  # time_zone_local             : "Europe/Kiev"          # Force time calculations to be local, in case remotely run.  See https://www.zeitverschiebung.net/en/all-time-zones.html
 
 language_ua:
   month_02                 : "Лютий 2022"
