@@ -21,7 +21,8 @@ library(ggplot2)   # graphs
 source("./scripts/common-functions.R")
 # ---- declare-globals ---------------------------------------------------------
 # config                         <- config::get()
-config                         <- config::get(config = "language_ua")
+# config                         <- config::get(config = "language_ua")
+config                         <- config::get(config = "language_en")
 
 # ---- declare-functions -------------------------------------------------------
 # custom function for HTML tables
