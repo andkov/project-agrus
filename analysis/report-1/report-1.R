@@ -21,8 +21,8 @@ library(ggplot2)   # graphs
 source("./scripts/common-functions.R")
 # ---- declare-globals ---------------------------------------------------------
 # config                         <- config::get()
-config                         <- config::get(config = "language_ua")
-# config                         <- config::get(config = "language_en")
+# config                         <- config::get(config = "language_ua")
+config                         <- config::get(config = "language_en")
 
 # ---- declare-functions -------------------------------------------------------
 # custom function for HTML tables
@@ -76,9 +76,15 @@ ds_date_tally <-
     event_tally_within_day = dplyr::n()
     ,duration_total_day = sum(duration_minutes)
     ,duration_mean_day = mean(duration_minutes)
+    # ,duration_total_day_scaled = (hms::parse_hm("00:00")+duration_total_day) %>% hms::as_hms()
+    # ,duration_total_day_min = duration_total_day %>% hms::as_hms()
+    ,duration_total_day_min = hms::parse_hms("04:00:00")+ duration_total_day
+    # ,duration_mean_day_min = duration_mean_day %>% hms::as_hms()
+    # ,temp = hms::as_hms(start_t*0) %>% hms::parse_hms()
   )|>
   dplyr::ungroup()
 
+ds_date_tally 
 ds_date <-
   ds_date_sunrise |>
   dplyr::left_join(ds_date_tally, by = c("date" = "start_d")) |>
@@ -142,7 +148,7 @@ ds_event_within_day <-
     weekend     = lubridate::wday(start_d) %in% c(1,7)
   )
 
-ds_event_within_day %>% glimpse()
+# ds_event_within_day %>% glimpse()
 
 # ---- graph-1 -----------------------------------------------------------------
 # https://www.christies.com/en/lot/lot-5388667
@@ -201,12 +207,15 @@ g1 <-
 
   geom_rect(
     data = ds_event_within_day
-    ,aes(xmin = start_d - .5, xmax = start_d + .5, ymin = start_t, ymax = stop_t, x = NULL, fill = weekend)
+    ,aes(xmin = start_d - .43, xmax = start_d + .43, ymin = start_t, ymax = stop_t, x = NULL, fill = weekend)
     ,color = "black"
     # color = palette_solid$signal
     # , fill = palette_faint$signal,
+    # ,size = .15
     ,size = .15
   ) +
+  # geom_line(aes(y=duration_total_day_min ), color = "white", linetype="dashed", data = ds_date_tally)+
+  # geom_line(aes(y=duration_total_day_min), color = "white", linetype = "dashed", size = 2)+
 
   geom_text(aes(x=as.Date("2022-03-12")),label = config$day_of_invasion, y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
