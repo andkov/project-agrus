@@ -41,36 +41,6 @@ language_ua:
   y_label                  : "Година доби"
 
 language_en:
-  month_02:   "Feb 2022"
-  month_03:   " Mar"
-  month_04:   " Apr"
-  day_of_invasion: "Days after second invasion"
-  number_symbol: "#"
-  day: "day"
-  date: "date"
-  sirens_per_day: "Number of sirens on that day"
-  zenith: "zenith"
-  dusk_astro: "astronomical"
-  dusk_nautical: "nautical"
-  dusk_civil:  "civil dusk"
-
-  dawn_civil:  "civil dawn"
-  dawn_nautical: "nautical"
-  dawn_astro: "astronomical"
-
-  monday: "Mo"
-  tuesday: "Tu"
-  wednesday: "We"
-  thursday: "Th"
-  friday: "Fr"
-  saturday: "Sa"
-  sunday: "Su"
-
-  title: "Timing, duration, and frequency of air-raid sirens in Vinnytsia, Ukraine"
-  subtitle: "**Subtitle**"
-  caption: "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
-  y_label: "Time of Day"
-
   month_02                 : "Feb 2022"
   month_03                 : " Mar"
   month_04                 : " Apr"
