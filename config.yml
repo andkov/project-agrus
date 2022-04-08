@@ -1,47 +1,44 @@
 default:
-
-  # directory_file_server                               : "//fileshare/agrus"
-  # directory_output                                    : !expr strftime(Sys.time(), "{directory_file_server}/data-private/derived/%Y-%m-%d")
-
-  # path_log_flow                                       : !expr strftime(Sys.time(), "data-unshared/log/%Y/%Y-%m/flow-%Y-%m-%d--%H-%M-%S.log")
-  # path_log_flow                                       : !expr strftime(Sys.time(), "//fileshare/agrus/log/%Y/%Y-%m/flow-%Y-%m-%d--%H-%M-%S.log")
-
-  path_raw_sunrise                                    : "data-public/raw/date-sunrise-2022.csv"
-  path_derived_sunrise_csv                            : "data-public/derived/date-sunrise-2022.csv"
-  path_derived_sunrise_rds                            : "data-public/derived/date-sunrise-2022.rds"
-  # path_metadata_ss_dx                                 : "data-public/metadata/ss-dx.csv"
-  # time_zone_local               :  "America/Chicago"          # Force time calculations to be local, in case remotely run.
+  # directory_file_server       : "//fileshare/agrus"
+  # directory_output            : !expr strftime(Sys.time(), "//fileshare/agrus/data-private/derived/%Y-%m-%d")
+  # path_log_flow               : !expr strftime(Sys.time(), "data-unshared/log/%Y/%Y-%m/flow-%Y-%m-%d--%H-%M-%S.log")
+  # path_log_flow               : !expr strftime(Sys.time(), "//fileshare/agrus/log/%Y/%Y-%m/flow-%Y-%m-%d--%H-%M-%S.log")
+  path_raw_sunrise              : "data-public/raw/date-sunrise-2022.csv"
+  path_derived_sunrise_csv      : "data-public/derived/date-sunrise-2022.csv"
+  path_derived_sunrise_rds      : "data-public/derived/date-sunrise-2022.rds"
+  # path_metadata_ss_dx         : "data-public/metadata/ss-dx.csv"
+  # time_zone_local             : "Europe/Kiev"          # Force time calculations to be local, in case remotely run.  See https://www.zeitverschiebung.net/en/all-time-zones.html
 
 language_ua:
-  month_02:   "Лютий 2022"
-  month_03:   " Березень"
-  month_04:   " Квітень"
-  day_of_invasion: "Доба після другого вторгнення"
-  number_symbol: "№"
-  day: "день"
-  date: "дата"
-  sirens_per_day: "Кількість повітряних тривог за добу"
-  zenith: " зеніт"
-  dusk_astro: "астрономічнi"
-  dusk_nautical: "морськi"
-  dusk_civil:  "цивільнi сутінки"
+  month_02                 : "Лютий 2022"
+  month_03                 : " Березень"
+  month_04                 : " Квітень"
+  day_of_invasion          : "Доба після другого вторгнення"
+  number_symbol            : "№"
+  day                      : "день"
+  date                     : "дата"
+  sirens_per_day           : "Кількість повітряних тривог за добу"
+  zenith                   : " зеніт"
+  dusk_astro               : "астрономічнi"
+  dusk_nautical            : "морськi"
+  dusk_civil               : "цивільнi сутінки"
 
-  dawn_civil:  "цивільний світанок"
-  dawn_nautical: "морський"
-  dawn_astro: "астрономічний"
+  dawn_civil               : "цивільний світанок"
+  dawn_nautical            : "морський"
+  dawn_astro               : "астрономічний"
 
-  monday: "Пт"
-  tuesday: "Сб"
-  wednesday: "Нд"
-  thursday: "Пн"
-  friday: "Вт"
-  saturday: "Ср"
-  sunday: "Чт"
+  monday                   : "Пт"
+  tuesday                  : "Сб"
+  wednesday                : "Нд"
+  thursday                 : "Пн"
+  friday                   : "Вт"
+  saturday                 : "Ср"
+  sunday                   : "Чт"
 
-  title: "Тривалисть та частота повітряних тривог у м.Вінниця"
-  subtitle: "м.Вінниця, перший місяць війни 2022 року"
-  caption: "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
-  y_label: "Година доби"
+  title                    : "Тривалисть та частота повітряних тривог у м.Вінниця"
+  subtitle                 : "м.Вінниця, перший місяць війни 2022 року"
+  caption                  : "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
+  y_label                  : "Година доби"
 
 language_en:
   month_02:   "Feb 2022"
@@ -73,3 +70,34 @@ language_en:
   subtitle: "**Subtitle**"
   caption: "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
   y_label: "Time of Day"
+
+  month_02                 : "Feb 2022"
+  month_03                 : " Mar"
+  month_04                 : " Apr"
+  day_of_invasion          : "Day of Invasion"
+  number_symbol            : "#"
+  day                      : "day"
+  date                     : "date"
+  sirens_per_day           : "sirens per day"
+  zenith                   : "zenith"
+  dusk_astro               : "astronomical dusk"
+  dusk_nautical            : "nautical dusk"
+  dusk_civil               : "civil dusk"
+
+  dawn_civil               : "civil dawn"
+  dawn_nautical            : "nautical dawn"
+  dawn_astro               : "astronomical dawn"
+
+  monday                   : "Mo"
+  tuesday                  : "Tu"
+  wednesday                : "Wd"
+  thursday                 : "Th"
+  friday                   : "Fr"
+  saturday                 : "Sa"
+  sunday                   : "Su"
+
+  title                    : "**Title**"
+  subtitle                 : "**Subtitle**"
+  caption                  : "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
+  y_label                  : "Time of Day"
+
