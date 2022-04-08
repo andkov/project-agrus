@@ -1,6 +1,6 @@
 # Vinnytsia and Ukraine
 
-Collection of data sets and analyses related to Ukraine in general and Vinnytsia in particulare.
+Collection of data sets and analyses related to Ukraine in general and Vinnytsia in particular.
 
 
 # Air Sirens
