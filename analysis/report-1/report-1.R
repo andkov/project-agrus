@@ -76,12 +76,9 @@ ds_date_tally <-
     event_tally_within_day = dplyr::n()
     ,duration_total_day = sum(duration_minutes)
     ,duration_mean_day = mean(duration_minutes)
-    # ,duration_total_day_scaled = (hms::parse_hm("00:00")+duration_total_day) %>% hms::as_hms()
-    # ,duration_total_day_min = duration_total_day %>% hms::as_hms()
-    ,duration_total_day_min = hms::parse_hms("04:00:00")+ duration_total_day
-    # ,duration_mean_day_min = duration_mean_day %>% hms::as_hms()
-    # ,temp = hms::as_hms(start_t*0) %>% hms::parse_hms()
-  )|>
+    ,duration_total_day_min = (duration_total_day*60) %>% hms::as_hms()
+    ,duration_mean_day_min = (duration_mean_day*60) %>% hms::as_hms()
+  ) %>% 
   dplyr::ungroup()
 
 ds_date_tally 
@@ -191,8 +188,9 @@ palette_solid <- list(
 palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
 
 g1 <-
-  ds_date |>
-  ggplot(aes(x = date)) +
+  ds_date %>% 
+  {
+  ggplot(., aes(x = date)) +
   geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_faint$night       , color = NA) +
   geom_ribbon(aes(ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_faint$astronomical, color = NA) +
   geom_ribbon(aes(ymin = start_nautical         , ymax = start_civil            ), fill = palette_faint$nautical    , color = NA) +
@@ -214,8 +212,8 @@ g1 <-
     # ,size = .15
     ,size = .15
   ) +
-  # geom_line(aes(y=duration_total_day_min ), color = "white", linetype="dashed", data = ds_date_tally)+
-  # geom_line(aes(y=duration_total_day_min), color = "white", linetype = "dashed", size = 2)+
+  geom_line(aes(y=duration_mean_day_min ), color = "white", linetype = "dotted", size = .2)+
+  geom_line(aes(y=duration_total_day_min), color = "white", linetype = "dashed", size = .2)+
 
   geom_text(aes(x=as.Date("2022-03-12")),label = config$day_of_invasion, y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
@@ -233,14 +231,9 @@ g1 <-
   annotate("text", label = config$dawn_nautical, x = min(ds_date$date) + 1, y=ds_date$start_nautical[1]     , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
   annotate("text", label = config$dawn_astro   , x = min(ds_date$date) + 1, y=ds_date$start_astronomical[1] , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
 
-  # geom_text(label = config$dusk_astro   , x = as.Date("2022-02-26"), aes(y = hms::parse_hms("19:20:00")), color ="white", size =1.8,srt=+3, hjust= .35)+
-  # geom_text(label = config$dusk_nautical, x = as.Date("2022-02-27"), aes(y = hms::parse_hms("18:40:00")), color ="white", size =1.8,srt=+3, hjust=1   )+
-  # geom_text(label = config$dusk_civil   , x = as.Date("2022-02-27"), aes(y = hms::parse_hms("18:05:00")), color ="white", size =1.8,srt=+3, hjust= .2 )+
-  # geom_text(label = config$dawn_civil   , x = as.Date("2022-02-28"), aes(y = hms::parse_hms("06:35:00")), color ="white", size =1.8,srt=-3, hjust= .5 )+
-  # geom_text(label = config$dawn_nautical, x = as.Date("2022-02-28"), aes(y = hms::parse_hms("06:00:00")), color ="white", size =1.8,srt=-3, hjust=1.15)+
-  # geom_text(label = config$dawn_astro   , x = as.Date("2022-02-27"), aes(y = hms::parse_hms("05:25:00")), color ="white", size =1.8,srt=-3, hjust= .6 )+
-
-
+  annotate("text", label = config$siren_total   , x =as.Date("2022-02-24") + 1, y=hms::parse_hms("02:40:00") , color ="white", size =1.8,srt=0, hjust = 0, vjust = -.1)+
+  annotate("text", label = config$siren_mean   , x =as.Date("2022-02-24") + 1, y=hms::parse_hms("01:00:00") , color ="white", size =1.8,srt=0, hjust = 0, vjust = -.1)+
+      
   geom_text(label = config$monday   , x=as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
   geom_text(label = config$tuesday  , x=as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
   geom_text(label = config$wednesday, x=as.Date("2022-02-27"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
@@ -255,9 +248,11 @@ g1 <-
     ,expand = expansion(mult=c(0,.05))
     ) +
   scale_y_time(
-    breaks = hms::as_hms(c("00:00:00", "04:00:00", "08:00:00", "12:00:00", "16:00:00", "20:00:00", "24:00:00")),
+    breaks = hms::as_hms(c("00:00:00", "02:00:00", "04:00:00","06:00:00",  "08:00:00", "10:00:00", "12:00:00", "14:00:00", "16:00:00",
+                           "18:00:00",  "20:00:00", "22:00:00", "24:00:00")),
     # minor_breaks = hms::as_hms(c("01:00:00", "02:00:00", "03:00:00", "05:00:00", "06:00:00", "07:00:00", "09:00:00")),
-    labels = c("00", "04", "08", "12", "16", "20", "24")
+    
+    labels = c("00","02", "04", "06","08", "10","12","14", "16","18", "20","22", "24")
     ,expand = expansion(mult=c(.06,.045))
     # ,sec.axis = sec_axis(name="Secondary")
   ) +
@@ -287,6 +282,7 @@ g1 <-
     ,panel.grid = element_blank()
     ,axis.ticks.y = element_line(size =.1)
   )
+  }
 g1
 ggsave(
   plot = g1,
@@ -296,3 +292,4 @@ ggsave(
   dpi      = 400,
   bg       = "white"
 )
+ds_date_tally
