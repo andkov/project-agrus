@@ -8,11 +8,12 @@ Air Siren Cyclograms
 
 *jump to language:*  [український](#український), [English](#english)
 
-### український
+### український <img src="utility/assets/../flag-icons-4.1.4/flags/4x3/ua.svg" alt = "ua" style="width:20px;">
 
 ![Air Sirens in Vinnytsia (UA)][air-ua]
 
-### English
+### English <img src="utility/assets/../flag-icons-4.1.4/flags/4x3/gb.svg" alt = "gb" style="width:20px;">
+
 ![Air Sirens in Vinnytsia (EN)][air-en]
 
 Summaries
