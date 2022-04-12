@@ -20,9 +20,9 @@ library(ggplot2)   # graphs
 # ---- load-sources ------------------------------------------------------------
 source("./scripts/common-functions.R")
 # ---- declare-globals ---------------------------------------------------------
-# config                         <- config::get()
+config                         <- config::get(config = "default")
 # config                         <- config::get(config = "language_ua")
-config                         <- config::get(config = "language_en")
+# config                         <- config::get(config = "language_en")
 
 # ---- declare-functions -------------------------------------------------------
 # custom function for HTML tables
@@ -89,12 +89,12 @@ ds_date <-
     date_index       = 0L + as.integer(difftime(date, min(date), units = "days")),
     date_index_rev   = 0L + as.integer(difftime(max(date), date, units = "days")),
     date_of_month    = strftime(date, "%d") %>% as.integer(),
-    month_name       = case_when(
-      date == as.Date("2022-02-26") ~ config$month_02,
-      date == as.Date("2022-03-02") ~ config$month_03,
-      date == as.Date("2022-04-02") ~ config$month_04,
-      TRUE ~ " "
-    ),
+    # month_name       = case_when(
+    #   date == as.Date("2022-02-26") ~ config$month_02,
+    #   date == as.Date("2022-03-02") ~ config$month_03,
+    #   date == as.Date("2022-04-02") ~ config$month_04,
+    #   TRUE ~ " "
+    # ),
     date_display     = sprintf("%2i", date_index+1),
     date_display     =
       dplyr::case_when(
@@ -103,17 +103,19 @@ ds_date <-
         TRUE                  ~ date_display
       ),
 
-    date_display2     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
-    date_display2     =
-      dplyr::case_when(
-        date_index      == 0  ~ NA_character_,
-        date_index_rev  == 0  ~ NA_character_,
-        TRUE                  ~ date_display2
-      )
+    # date_display2     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
+    # date_display2     =
+    #   dplyr::case_when(
+    #     date_index      == 0  ~ NA_character_,
+    #     date_index_rev  == 0  ~ NA_character_,
+    #     TRUE                  ~ date_display2
+    #   )
   ) |>
   dplyr::mutate(
     event_tally_within_day = dplyr::if_else(1L <= date_index & 1L <= date_index_rev, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
   )
+
+
 ds_date %>% glimpse()
 ds_date$date_display
 
@@ -187,8 +189,29 @@ palette_solid <- list(
 
 palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
 
-g1 <-
+cyclogram <- function (language_pack) {
+  lang <- config::get(config = language_pack)
+  # browser()
+  if (is.null(lang$title)) {
+    stop("The language pack `", language_pack, "` is not recognized.")
+  }
+  
   ds_date %>% 
+    dplyr::mutate(
+      month_name       = case_when(
+        date == as.Date("2022-02-26") ~ lang$month_02,
+        date == as.Date("2022-03-02") ~ lang$month_03,
+        date == as.Date("2022-04-02") ~ lang$month_04,
+        TRUE ~ " "
+      ),
+      date_display2     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
+      date_display2     =
+        dplyr::case_when(
+          date_index      == 0  ~ NA_character_,
+          date_index_rev  == 0  ~ NA_character_,
+          TRUE                  ~ date_display2
+        )
+    ) |> 
   ggplot(aes(x = date)) +
   geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_faint$night       , color = NA) +
   geom_ribbon(aes(ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_faint$astronomical, color = NA) +
@@ -214,32 +237,32 @@ g1 <-
   geom_line(aes(y=duration_mean_day_min ), color = "white", linetype = "dotted", size = .2, na.rm = T)+
   geom_line(aes(y=duration_total_day_min), color = "white", linetype = "dashed", size = .2, na.rm = T)+
 
-  geom_text(aes(x=as.Date("2022-03-12")),label = config$day_of_invasion, y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
+  geom_text(aes(x=as.Date("2022-03-12")),label = lang$day_of_invasion, y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
   geom_text(aes(label = date_display2), y = -Inf, hjust = .5, vjust=-.2,  srt = 0, size = 1.6, na.rm = T, color ="grey40") +
 
-  geom_text(aes(x=as.Date("2022-03-11")),label = config$sirens_per_day, y = Inf,vjust = 3.8, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
+  geom_text(aes(x=as.Date("2022-03-11")),label = lang$sirens_per_day, y = Inf,vjust = 3.8, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
 
-  geom_text(label = config$zenith,        x =as.Date("2022-03-03"), aes(y = hms::parse_hms("12:50:00")), color =palette_solid$zenith, size =3)+
+  geom_text(label = lang$zenith,        x =as.Date("2022-03-03"), aes(y = hms::parse_hms("12:50:00")), color =palette_solid$zenith, size =3)+
 
-  annotate("text", label = config$dusk_astro   , x = min(ds_date$date) + 1, y=ds_date$stop_astronomical[1]  , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
-  annotate("text", label = config$dusk_nautical, x = min(ds_date$date) + 1, y=ds_date$stop_nautical[1]      , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
-  annotate("text", label = config$dusk_civil   , x = min(ds_date$date) + 1, y=ds_date$stop_civil[1]         , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
-  annotate("text", label = config$dawn_civil   , x = min(ds_date$date) + 1, y=ds_date$start_civil[1]        , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
-  annotate("text", label = config$dawn_nautical, x = min(ds_date$date) + 1, y=ds_date$start_nautical[1]     , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
-  annotate("text", label = config$dawn_astro   , x = min(ds_date$date) + 1, y=ds_date$start_astronomical[1] , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
+  annotate("text", label = lang$dusk_astro   , x = min(ds_date$date) + 1, y=ds_date$stop_astronomical[1]  , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
+  annotate("text", label = lang$dusk_nautical, x = min(ds_date$date) + 1, y=ds_date$stop_nautical[1]      , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
+  annotate("text", label = lang$dusk_civil   , x = min(ds_date$date) + 1, y=ds_date$stop_civil[1]         , color ="white", size =1.8,srt=+3, hjust = 0, vjust = 1.1)+
+  annotate("text", label = lang$dawn_civil   , x = min(ds_date$date) + 1, y=ds_date$start_civil[1]        , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
+  annotate("text", label = lang$dawn_nautical, x = min(ds_date$date) + 1, y=ds_date$start_nautical[1]     , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
+  annotate("text", label = lang$dawn_astro   , x = min(ds_date$date) + 1, y=ds_date$start_astronomical[1] , color ="white", size =1.8,srt=-3, hjust = 0, vjust = -.1)+
 
-  annotate("text", label = config$siren_total   , x =as.Date("2022-02-24") + 1, y=hms::parse_hms("02:40:00") , color ="white", size =1.8,srt=0, hjust = 0, vjust = -.1)+
-  annotate("text", label = config$siren_mean   , x =as.Date("2022-02-24") + 1, y=hms::parse_hms("01:00:00") , color ="white", size =1.8,srt=0, hjust = 0, vjust = -.1)+
+  annotate("text", label = lang$siren_total   , x =as.Date("2022-02-24") + 1, y=hms::parse_hms("02:40:00") , color ="white", size =1.8,srt=0, hjust = 0, vjust = -.1)+
+  annotate("text", label = lang$siren_mean   , x =as.Date("2022-02-24") + 1, y=hms::parse_hms("01:00:00") , color ="white", size =1.8,srt=0, hjust = 0, vjust = -.1)+
       
-  geom_text(label = config$monday   , x=as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-  geom_text(label = config$tuesday  , x=as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
-  geom_text(label = config$wednesday, x=as.Date("2022-02-27"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
-  geom_text(label = config$thursday , x=as.Date("2022-02-28"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-  geom_text(label = config$friday   , x=as.Date("2022-03-01"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-  geom_text(label = config$saturday , x=as.Date("2022-03-02"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
-  geom_text(label = config$sunday   , x=as.Date("2022-03-03"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = lang$monday   , x=as.Date("2022-02-25"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = lang$tuesday  , x=as.Date("2022-02-26"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
+  geom_text(label = lang$wednesday, x=as.Date("2022-02-27"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal2, size =1.6)+
+  geom_text(label = lang$thursday , x=as.Date("2022-02-28"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = lang$friday   , x=as.Date("2022-03-01"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = lang$saturday , x=as.Date("2022-03-02"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
+  geom_text(label = lang$sunday   , x=as.Date("2022-03-03"), aes(y = hms::parse_hms("08:29:00")), color =palette_solid$signal,  size =1.6,)+
   #https://uk.wikipedia.org/wiki/%D0%A1%D0%B2%D1%96%D1%82%D0%B0%D0%BD%D0%BE%D0%BA
   scale_x_date(
     date_labels = "%b\n%d", date_breaks = "1 week", date_minor_breaks = "1 week"
@@ -262,10 +285,10 @@ g1 <-
   coord_cartesian(ylim = hms::parse_hms(c("00:00:00", "23:59:59"))) +
   theme_minimal() +
   labs(
-    title = config$title
-    ,caption = config$caption
+    title = lang$title
+    ,caption = lang$caption
     ,x = NULL
-    ,y = config$y_label
+    ,y = lang$y_label
   ) +
   theme(
     legend.position = "none"
@@ -281,14 +304,26 @@ g1 <-
     ,panel.grid = element_blank()
     ,axis.ticks.y = element_line(size =.1)
   )
+}
 
-g1
+lang_name <- "language_ua"
+cyclogram(lang_name)
 ggsave(
-  plot = g1,
-  filename = "analysis/report-1/prints/1-cyclogram.png",
+  plot     = ggplot2::last_plot(),
+  filename = sprintf("analysis/report-1/prints/1-cyclogram-%s.png", lang_name),
   height   = 4,
   width    = 5,
   dpi      = 400,
   bg       = "white"
 )
-ds_date_tally
+
+lang_name <- "language_en"
+cyclogram(lang_name)
+ggsave(
+  plot     = ggplot2::last_plot(),
+  filename = sprintf("analysis/report-1/prints/1-cyclogram-%s.png", lang_name),
+  height   = 4,
+  width    = 5,
+  dpi      = 400,
+  bg       = "white"
+)
