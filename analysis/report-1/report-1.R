@@ -189,8 +189,7 @@ palette_faint <- as.list(scales::alpha(palette_solid, alpha = .8))
 
 g1 <-
   ds_date %>% 
-  {
-  ggplot(., aes(x = date)) +
+  ggplot(aes(x = date)) +
   geom_ribbon(aes(ymin = hms::as_hms("00:00:00"), ymax = start_astronomical     ), fill = palette_faint$night       , color = NA) +
   geom_ribbon(aes(ymin = start_astronomical     , ymax = start_nautical         ), fill = palette_faint$astronomical, color = NA) +
   geom_ribbon(aes(ymin = start_nautical         , ymax = start_civil            ), fill = palette_faint$nautical    , color = NA) +
@@ -212,8 +211,8 @@ g1 <-
     # ,size = .15
     ,size = .15
   ) +
-  geom_line(aes(y=duration_mean_day_min ), color = "white", linetype = "dotted", size = .2)+
-  geom_line(aes(y=duration_total_day_min), color = "white", linetype = "dashed", size = .2)+
+  geom_line(aes(y=duration_mean_day_min ), color = "white", linetype = "dotted", size = .2, na.rm = T)+
+  geom_line(aes(y=duration_total_day_min), color = "white", linetype = "dashed", size = .2, na.rm = T)+
 
   geom_text(aes(x=as.Date("2022-03-12")),label = config$day_of_invasion, y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
@@ -257,7 +256,7 @@ g1 <-
     # ,sec.axis = sec_axis(name="Secondary")
   ) +
   scale_fill_manual(values = c("TRUE"=palette_faint$signal2, "FALSE"=palette_faint$signal))+
-  scale_color_brewer(type = "seq", palette = "YlOrRd") +
+  # scale_color_brewer(type = "seq", palette = "YlOrRd") +
   # # scale_color_continuous(type = "viridis") +
   scale_colour_viridis_b(direction = -1) +
   coord_cartesian(ylim = hms::parse_hms(c("00:00:00", "23:59:59"))) +
@@ -282,7 +281,7 @@ g1 <-
     ,panel.grid = element_blank()
     ,axis.ticks.y = element_line(size =.1)
   )
-  }
+
 g1
 ggsave(
   plot = g1,
