@@ -6,9 +6,9 @@ Collection of data sets and analyses related to Ukraine in general and Vinnytsia
 Air Siren Cyclograms
 --------------------------
 
-*jump to language:*  <a href="#український-"><img src="utility/assets/../flag-icons-4.1.4/flags/4x3/ua.svg" alt = "ua" style="width:20px;"></a> <a href="#english-"><img src="utility/assets/../flag-icons-4.1.4/flags/4x3/gb.svg" alt = "en" style="width:20px;"></a>
+*jump to language:*  <a href="#українська-"><img src="utility/assets/../flag-icons-4.1.4/flags/4x3/ua.svg" alt = "ua" style="width:20px;"></a> <a href="#english-"><img src="utility/assets/../flag-icons-4.1.4/flags/4x3/gb.svg" alt = "en" style="width:20px;"></a>
 
-### український <img src="utility/assets/../flag-icons-4.1.4/flags/4x3/ua.svg" alt = "ua" style="width:20px;">
+### Українська <img src="utility/assets/../flag-icons-4.1.4/flags/4x3/ua.svg" alt = "ua" style="width:20px;">
 
 ![Air Sirens in Vinnytsia (UA)][air-ua]
 
