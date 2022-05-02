@@ -95,20 +95,20 @@ ds_date <-
     #   date == as.Date("2022-04-02") ~ config$month_04,
     #   TRUE ~ " "
     # ),
-    date_display     = sprintf("%2i", date_index+1),
-    date_display     =
+    date_index_display     = sprintf("%2i", date_index+1),
+    date_index_display     =
       dplyr::case_when(
         date_index      == 0  ~ NA_character_,
         date_index_rev  == 0  ~ NA_character_,
-        TRUE                  ~ date_display
+        TRUE                  ~ date_index_display
       ),
 
-    # date_display2     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
-    # date_display2     =
+    # date_display     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
+    # date_display     =
     #   dplyr::case_when(
     #     date_index      == 0  ~ NA_character_,
     #     date_index_rev  == 0  ~ NA_character_,
-    #     TRUE                  ~ date_display2
+    #     TRUE                  ~ date_display
     #   )
   ) |>
   dplyr::mutate(
@@ -117,7 +117,7 @@ ds_date <-
 
 
 ds_date %>% glimpse()
-ds_date$date_display
+ds_date$date_index_display
 
 ds_event_within_day <-
   ds_event |>
@@ -204,12 +204,12 @@ cyclogram <- function (language_pack) {
         date == as.Date("2022-04-02") ~ lang$month_04,
         TRUE ~ " "
       ),
-      date_display2     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
-      date_display2     =
+      date_display     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
+      date_display     =
         dplyr::case_when(
           date_index      == 0  ~ NA_character_,
           date_index_rev  == 0  ~ NA_character_,
-          TRUE                  ~ date_display2
+          TRUE                  ~ date_display
         )
     ) |> 
   ggplot(aes(x = date)) +
@@ -238,8 +238,8 @@ cyclogram <- function (language_pack) {
   geom_line(aes(y=duration_total_day_min), color = "white", linetype = "dashed", size = .2, na.rm = T)+
 
   geom_text(aes(x=as.Date("2022-03-12")),label = lang$day_of_invasion, y = -Inf,vjust = -5.5, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
-  geom_text(aes(label = date_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
-  geom_text(aes(label = date_display2), y = -Inf, hjust = .5, vjust=-.2,  srt = 0, size = 1.6, na.rm = T, color ="grey40") +
+  geom_text(aes(label = date_index_display) , y = -Inf, hjust = .5, vjust=- 4.9, srt = 0, size = 1.5, na.rm = T, color ="white") +
+  geom_text(aes(label = date_display), y = -Inf, hjust = .5, vjust=-.2,  srt = 0, size = 1.6, na.rm = T, color ="grey40") +
 
   geom_text(aes(x=as.Date("2022-03-11")),label = lang$sirens_per_day, y = Inf,vjust = 3.8, hjust = -.05 , size = 2, color = "white", lineheight=.8)+
   geom_text(aes(label = event_tally_within_day, color = event_tally_within_day), y = Inf, family = "mono", vjust = 1.3, na.rm = T, size=3.6) +
