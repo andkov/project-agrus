@@ -86,8 +86,8 @@ ds_date <-
   ds_date_sunrise |>
   dplyr::left_join(ds_date_tally, by = c("date" = "start_d")) |>
   dplyr::mutate(
-    date_index       = 0L + as.integer(difftime(date, min(date), units = "days")),
-    date_index_rev   = 0L + as.integer(difftime(max(date), date, units = "days")),
+    date_index       = 1L + as.integer(difftime(date, min(date), units = "days")),
+    date_index_rev   = 1L + as.integer(difftime(max(date), date, units = "days")),
     date_of_month    = strftime(date, "%d") %>% as.integer(),
     # month_name       = case_when(
     #   date == as.Date("2022-02-26") ~ config$month_02,
@@ -95,12 +95,13 @@ ds_date <-
     #   date == as.Date("2022-04-02") ~ config$month_04,
     #   TRUE ~ " "
     # ),
-    date_index_display     = sprintf("%2i", date_index+1),
+    date_index_display     = sprintf("%2i", date_index),
     date_index_display     =
       dplyr::case_when(
-        date_index      == 0  ~ NA_character_,
-        date_index_rev  == 0  ~ NA_character_,
-        TRUE                  ~ date_index_display
+        date_index      == 1L   ~ NA_character_,
+        date_index_rev  == 1L   ~ NA_character_,
+        date_index %% 5 == 0L   ~ date_index_display,
+        TRUE                    ~ NA_character_
       ),
 
     # date_display     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
@@ -114,7 +115,7 @@ ds_date <-
   dplyr::mutate(
     event_tally_within_day = dplyr::if_else(1L <= date_index & 1L <= date_index_rev, dplyr::coalesce(event_tally_within_day, 0L), NA_integer_)
   )
-
+# (1:100)[1:100 %% 5 == 0L]
 
 ds_date %>% glimpse()
 ds_date$date_index_display
