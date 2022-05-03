@@ -196,13 +196,13 @@ cyclogram <- function (language_pack) {
   if (is.null(lang$title)) {
     stop("The language pack `", language_pack, "` is not recognized.")
   }
-  
+  # browser()
   ds_date %>% 
     dplyr::mutate(
       month_name       = case_when(
-        date == as.Date("2022-02-26") ~ lang$month_02,
-        date == as.Date("2022-03-02") ~ lang$month_03,
-        date == as.Date("2022-04-02") ~ lang$month_04,
+        date == as.Date("2022-02-27") ~ lang$month_02,
+        date == as.Date("2022-03-06") ~ lang$month_03,
+        date == as.Date("2022-04-03") ~ lang$month_04,
         TRUE ~ " "
       ),
       date_display     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
@@ -210,7 +210,10 @@ cyclogram <- function (language_pack) {
         dplyr::case_when(
           date_index      == 0  ~ NA_character_,
           date_index_rev  == 0  ~ NA_character_,
-          TRUE                  ~ date_display
+          # lubridate::day(date)  == 1L ~ date_display, # Display first day of month
+          2L <= nchar(month_name)     ~ date_display, # Rouhgly first day of month
+          lubridate::wday(date) == 1L ~ date_display, # Display Sundays
+          TRUE                  ~ NA_character_
         )
     ) |> 
   ggplot(aes(x = date)) +

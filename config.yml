@@ -54,7 +54,7 @@ language_en:
   zenith                   : "zenith"
   dusk_astro               : "astronomical"
   dusk_nautical            : "nautical"
-  dusk_civil               : "  civil dusk"
+  dusk_civil               : "civil dusk"
   siren_total              : "total time"
   siren_mean               : "mean time"
   
