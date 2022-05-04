@@ -10,9 +10,19 @@ default:
   # time_zone_local             : "Europe/Kiev"          # Force time calculations to be local, in case remotely run.  See https://www.zeitverschiebung.net/en/all-time-zones.html
 
 language_ua:
+  month_01                 : "Jan"
   month_02                 : "Лютий 2022"
-  month_03                 : " Березень"
-  month_04                 : " Квітень"
+  month_03                 : "Березень"
+  month_04                 : "Квітень"
+  month_05                 : "May"
+  month_06                 : "Jun"
+  month_07                 : "Jul"
+  month_08                 : "Aug"
+  month_09                 : "Sep"
+  month_10                 : "Oct"
+  month_11                 : "Nov"
+  month_12                 : "Dec"
+
   day_of_invasion          : "доба після 24 лютого"
   number_symbol            : "№"
   day                      : "день"
@@ -40,12 +50,22 @@ language_ua:
   subtitle                 : "м.Вінниця, перший місяць війни 2022 року"
   caption                  : "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
   y_label                  : "година доби"
-  
+
 
 language_en:
+  month_01                 : "Jan"
   month_02                 : "Feb 2022"
-  month_03                 : " Mar"
-  month_04                 : " Apr"
+  month_03                 : "Mar"
+  month_04                 : "Apr"
+  month_05                 : "May"
+  month_06                 : "Jun"
+  month_07                 : "Jul"
+  month_08                 : "Aug"
+  month_09                 : "Sep"
+  month_10                 : "Oct"
+  month_11                 : "Nov"
+  month_12                 : "Dec"
+
   day_of_invasion          : "days after Feb 24"
   number_symbol            : "#"
   day                      : "day"
@@ -57,7 +77,7 @@ language_en:
   dusk_civil               : "civil dusk"
   siren_total              : "total time"
   siren_mean               : "mean time"
-  
+
   dawn_civil               : "civil dawn"
   dawn_nautical            : "nautical"
   dawn_astro               : "astronomical"
@@ -74,4 +94,3 @@ language_en:
   subtitle                 : "**Subtitle**"
   caption                  : "Design by Will Beasley and Andriy Koval, data by Victor Dyadkovych                                                                      "
   y_label                  : "time of day"
-

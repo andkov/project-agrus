@@ -203,7 +203,15 @@ cyclogram <- function (language_pack) {
         date == as.Date("2022-02-27") ~ lang$month_02,
         date == as.Date("2022-03-06") ~ lang$month_03,
         date == as.Date("2022-04-03") ~ lang$month_04,
-        TRUE ~ " "
+        date == as.Date("2022-05-01") ~ lang$month_05,
+        date == as.Date("2022-06-05") ~ lang$month_06,
+        date == as.Date("2022-07-03") ~ lang$month_07,
+        date == as.Date("2022-08-07") ~ lang$month_08,
+        date == as.Date("2022-09-04") ~ lang$month_09,
+        date == as.Date("2022-10-02") ~ lang$month_10,
+        date == as.Date("2022-11-06") ~ lang$month_11,
+        date == as.Date("2022-12-04") ~ lang$month_12,
+        TRUE                          ~ " "
       ),
       date_display     = sprintf("%2s\n%s",as.character(date_of_month),month_name),
       date_display     =
