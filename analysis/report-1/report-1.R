@@ -61,7 +61,8 @@ ds_event <-
     stop_t           = hms::as_hms(stop_dt),
   )
 
-date_range <- range(ds_event$start_d, ds_event$stop_d)
+# date_range <- range(ds_event$start_d, ds_event$stop_d)
+date_range <- c(min(ds_event$start_d), max(ds_event$stop_d))
 
 ds_date_sunrise <-
   ds_date_sunrise |>
@@ -324,7 +325,7 @@ ggsave(
   plot     = ggplot2::last_plot(),
   filename = sprintf("analysis/report-1/prints/1-cyclogram-%s.png", lang_name),
   height   = 4,
-  width    = 5,
+  width    = 7,
   dpi      = 400,
   bg       = "white"
 )
@@ -335,7 +336,7 @@ ggsave(
   plot     = ggplot2::last_plot(),
   filename = sprintf("analysis/report-1/prints/1-cyclogram-%s.png", lang_name),
   height   = 4,
-  width    = 5,
+  width    = 7,
   dpi      = 400,
   bg       = "white"
 )
