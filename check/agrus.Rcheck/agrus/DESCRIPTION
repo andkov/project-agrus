@@ -20,8 +20,8 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 NeedsCompilation: no
-Packaged: 2022-05-29 18:22:08 UTC; runner
+Packaged: 2022-05-30 01:40:06 UTC; runner
 Author: Will Beasley [aut, cre] (<https://orcid.org/0000-0002-5613-5006>),
   Andrey Koval [aut]
 Maintainer: Will Beasley <wibeasley@hotmail.com>
-Built: R 4.2.0; ; 2022-05-29 18:22:24 UTC; unix
+Built: R 4.2.0; ; 2022-05-30 01:40:25 UTC; unix
