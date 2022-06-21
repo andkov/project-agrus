@@ -14,7 +14,7 @@
 library(grid)
 library(ggplot2)
 library(dichromat)
-library(RColorBrewer)
+# library(RColorBrewer)
 # devtools::install_github(repo="Melinae/TabularManifest")
 # library(TabularManifest) # custom histographs for quick EDA
 
