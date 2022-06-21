@@ -53,13 +53,34 @@ rm(col_types)
 #   which prints only the first 10 rows by default.  It also lists the data type of each column.
 # ds
 
-adjust_daylight_savings <- function (date, time) {
+adjust_daylight_savings <- function (date, time, is_morning = NA_integer_) {
   # browser()
-  dplyr::if_else(
-    dplyr::between(date, as.Date("2022-03-27"), as.Date("2022-10-29")), # Sunday to Saturday
-    hms::hms(lubridate::hms(time) + lubridate::hours(1)),
-    time,
-  )
+  time <- dplyr::coalesce(time, hms::hms(hours=0, minutes=0, seconds=0))
+
+  # time <- dplyr::if_else(!is.na(time), time, hms::hms(hours=0, minutes=0, seconds=0))
+  
+  time <- 
+    dplyr::if_else(
+      dplyr::between(date, as.Date("2022-03-27"), as.Date("2022-10-29")), # Sunday to Saturday
+      hms::hms(lubridate::hms(time) + lubridate::hours(1)),
+      time
+    )
+  
+  if (is.na(is_morning)) {
+    time 
+  } else if (is_morning) {
+    dplyr::if_else(
+      time < lubridate::hms("00:00:01"),
+      hms::hms(lubridate::hms("00:00:01")),
+      time
+    )
+  } else{
+    dplyr::if_else(
+      lubridate::hms("23:59:59") < time,
+      hms::hms(lubridate::hms("23:59:59")),
+      time
+    )
+  }
 }
 
 # ---- tweak-data --------------------------------------------------------------
@@ -90,12 +111,12 @@ ds <-
     sunrise                = adjust_daylight_savings(date, sunrise            ),
     zenith                 = adjust_daylight_savings(date, zenith             ),
     sunset                 = adjust_daylight_savings(date, sunset             ),
-    start_astronomical     = adjust_daylight_savings(date, start_astronomical ),
-    start_nautical         = adjust_daylight_savings(date, start_nautical     ),
-    start_civil            = adjust_daylight_savings(date, start_civil        ),
-    stop_civil             = adjust_daylight_savings(date, stop_civil         ),
-    stop_nautical          = adjust_daylight_savings(date, stop_nautical      ),
-    stop_astronomical      = adjust_daylight_savings(date, stop_astronomical  ),
+    start_astronomical     = adjust_daylight_savings(date, start_astronomical , is_morning = TRUE),
+    start_nautical         = adjust_daylight_savings(date, start_nautical     , is_morning = TRUE),
+    start_civil            = adjust_daylight_savings(date, start_civil        , is_morning = TRUE),
+    stop_civil             = adjust_daylight_savings(date, stop_civil         , is_morning = FALSE),
+    stop_nautical          = adjust_daylight_savings(date, stop_nautical      , is_morning = FALSE),
+    stop_astronomical      = adjust_daylight_savings(date, stop_astronomical  , is_morning = FALSE),
   ) |> 
   # dplyr::mutate(
   #   dplyr::across(
