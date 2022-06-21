@@ -55,7 +55,14 @@ rm(col_types)
 
 adjust_daylight_savings <- function (date, time, is_morning = NA_integer_) {
   # browser()
-  time <- dplyr::coalesce(time, hms::hms(hours=0, minutes=0, seconds=0))
+  time <- 
+    if (is.na(is_morning)) {
+      time 
+    } else if (is_morning) {
+      dplyr::coalesce(time, hms::hms(hours=0, minutes=0, seconds=1))
+    } else {
+      dplyr::coalesce(time, hms::hms(hours=23, minutes=59, seconds=59))
+    }
 
   # time <- dplyr::if_else(!is.na(time), time, hms::hms(hours=0, minutes=0, seconds=0))
   
@@ -82,6 +89,8 @@ adjust_daylight_savings <- function (date, time, is_morning = NA_integer_) {
     )
   }
 }
+
+# lubridate::hms("23:59:59") < hms::hms(lubridate::hms("23:59:59") + lubridate::hours(1))
 
 # ---- tweak-data --------------------------------------------------------------
 # OuhscMunge::column_rename_headstart(ds) # Help write `dplyr::select()` call.
