@@ -325,7 +325,7 @@ ggsave(
   plot     = ggplot2::last_plot(),
   filename = sprintf("analysis/report-1/prints/1-cyclogram-%s.png", lang_name),
   height   = 4,
-  width    = 7,
+  width    = 9,
   dpi      = 400,
   bg       = "white"
 )
@@ -336,7 +336,7 @@ ggsave(
   plot     = ggplot2::last_plot(),
   filename = sprintf("analysis/report-1/prints/1-cyclogram-%s.png", lang_name),
   height   = 4,
-  width    = 7,
+  width    = 9,
   dpi      = 400,
   bg       = "white"
 )
