@@ -6,18 +6,13 @@ exportPattern(".")
 
 # Import all packages listed as Imports or Depends
 import(
-  broom,
   checkmate,
   config,
   dplyr,
-  explore,
   ggplot2,
   googlesheets4,
-  janitor,
-  knitr,
   methods,
   OuhscMunge,
-  RColorBrewer,
   rmarkdown,
   scales,
   sessioninfo,
