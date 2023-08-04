@@ -2,8 +2,8 @@
 * using R version 4.3.1 (2023-06-16)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * R was compiled by
-    gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0
-    GNU Fortran (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0
+    gcc (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
+    GNU Fortran (Ubuntu 11.4.0-1ubuntu1~22.04) 11.4.0
 * running under: Ubuntu 22.04.2 LTS
 * using session charset: UTF-8
 * using options ‘--no-manual --as-cran’
