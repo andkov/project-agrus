@@ -17,8 +17,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 NeedsCompilation: no
-Packaged: 2024-09-23 12:34:08 UTC; runner
+Packaged: 2024-09-23 18:23:38 UTC; runner
 Author: Will Beasley [aut, cre] (<https://orcid.org/0000-0002-5613-5006>),
   Andrey Koval [aut]
 Maintainer: Will Beasley <wibeasley@hotmail.com>
-Built: R 4.4.1; ; 2024-09-23 12:34:11 UTC; unix
+Built: R 4.4.1; ; 2024-09-23 18:23:41 UTC; unix
