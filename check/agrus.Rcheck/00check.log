@@ -4,7 +4,7 @@
 * R was compiled by
     gcc (Ubuntu 13.2.0-23ubuntu4) 13.2.0
     GNU Fortran (Ubuntu 13.2.0-23ubuntu4) 13.2.0
-* running under: Ubuntu 24.04.1 LTS
+* running under: Ubuntu 24.04.2 LTS
 * using session charset: UTF-8
 * using options ‘--no-manual --as-cran’
 * checking for file ‘agrus/DESCRIPTION’ ... OK
