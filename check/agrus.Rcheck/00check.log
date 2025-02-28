@@ -1,9 +1,9 @@
 * using log directory ‘/home/runner/work/project-agrus/project-agrus/check/agrus.Rcheck’
-* using R version 4.4.2 (2024-10-31)
+* using R version 4.4.3 (2025-02-28)
 * using platform: x86_64-pc-linux-gnu
 * R was compiled by
-    gcc (Ubuntu 13.2.0-23ubuntu4) 13.2.0
-    GNU Fortran (Ubuntu 13.2.0-23ubuntu4) 13.2.0
+    gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
+    GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
 * running under: Ubuntu 24.04.2 LTS
 * using session charset: UTF-8
 * using options ‘--no-manual --as-cran’
